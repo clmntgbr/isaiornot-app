@@ -1,6 +1,7 @@
 "use client"
 
 import { AnalysisDetailDrawer } from "@/components/analysis-detail-drawer"
+import { MediaThumbnail } from "@/components/media-thumbnail"
 import { Progress } from "@/components/ui/progress"
 import {
   CONFIDENCE_LABEL,
@@ -54,23 +55,25 @@ export function AnalysisItem({ item }: AnalysisItemProps) {
   const progress = getAnalysisProgress(item.status)
   const cfg = item.verdict ? VERDICT_CONFIG[item.verdict] : null
 
+  const canOpenDrawer = isComplete || isFailed
+
   const openDrawer = () => {
-    if (isComplete) setDrawerOpen(true)
+    if (canOpenDrawer) setDrawerOpen(true)
   }
 
   return (
     <>
       <div
         className={cn(
-          "group relative flex cursor-pointer items-center gap-4 rounded-2xl border bg-card p-3 transition-all duration-200",
-          "hover:shadow-md",
+          "group relative flex items-center gap-4 rounded-2xl border bg-card p-3 transition-all duration-200",
+          canOpenDrawer && "cursor-pointer hover:shadow-md",
           isAnalyzing && "border-primary/40"
         )}
         onClick={openDrawer}
         role="button"
-        tabIndex={0}
+        tabIndex={canOpenDrawer ? 0 : -1}
         onKeyDown={(event) => {
-          if ((event.key === "Enter" || event.key === " ") && isComplete) {
+          if ((event.key === "Enter" || event.key === " ") && canOpenDrawer) {
             event.preventDefault()
             openDrawer()
           }
@@ -78,12 +81,7 @@ export function AnalysisItem({ item }: AnalysisItemProps) {
       >
         <div className="relative flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-secondary">
           {thumbnail ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={thumbnail}
-              alt={`Aperçu de ${displayName}`}
-              className="size-full object-cover"
-            />
+            <MediaThumbnail src={thumbnail} alt={`Aperçu de ${displayName}`} />
           ) : isVideo ? (
             <div className="flex size-full flex-col items-center justify-center gap-1 text-muted-foreground">
               <FileVideo className="size-5" />
@@ -139,14 +137,12 @@ export function AnalysisItem({ item }: AnalysisItemProps) {
                     {item.message}
                   </p>
                 ) : (
-                  <p className="text-sm text-destructive">
-                    Erreur d&apos;analyse
-                  </p>
+                  <p className="text-sm text-destructive">Analysis failed</p>
                 )}
               </div>
             ) : (
               <span className="text-sm text-muted-foreground">
-                En file d&apos;attente…
+                Processing...
               </span>
             )}
           </div>
@@ -156,19 +152,19 @@ export function AnalysisItem({ item }: AnalysisItemProps) {
           {isComplete ? (
             <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-[0.625rem] font-medium text-primary">
               <Check className="size-3" />
-              Analysé
+              Completed
             </span>
           ) : isAnalyzing ? (
             <span
               className="inline-flex size-11 items-center justify-center rounded-full bg-primary/10"
-              aria-label="Analyse en cours"
+              aria-label="Analysis in progress"
             >
               <Loader2 className="size-5 animate-spin text-primary" />
             </span>
           ) : isFailed ? (
             <span className="inline-flex items-center gap-1 rounded-full bg-destructive/10 px-2.5 py-1 text-[0.625rem] font-medium text-destructive">
               <CircleAlert className="size-3" />
-              Échoué
+              Failed
             </span>
           ) : null}
         </div>
