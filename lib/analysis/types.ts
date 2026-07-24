@@ -2,7 +2,7 @@ import { Paginate } from "../paginate"
 
 export type AnalysisVerdict = "likely_ai" | "likely_real" | "uncertain"
 export type AnalysisConfidence = "low" | "medium" | "high" | "unknown"
-export type AnalysisStatus = "pending" | "processing" | "analyzed" | "error"
+export type AnalysisStatus = "pending" | "processing" | "analyzed" | "failed"
 
 export interface Insight {
   noise: number
@@ -37,6 +37,8 @@ export interface Media {
 export interface Analysis {
   id: string
   status: AnalysisStatus
+  statuses?: string[]
+  message?: string | null
   finalScore?: number
   confidence?: AnalysisConfidence
   verdict?: AnalysisVerdict

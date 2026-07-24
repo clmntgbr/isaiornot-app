@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils"
 import {
   Bot,
   Check,
+  CircleAlert,
   FileVideo,
   HelpCircle,
   Loader2,
@@ -49,7 +50,7 @@ export function AnalysisItem({ item }: AnalysisItemProps) {
   )
   const isComplete = item.status === "analyzed" && item.verdict
   const isAnalyzing = item.status === "pending" || item.status === "processing"
-  const isError = item.status === "error"
+  const isFailed = item.status === "failed"
   const progress = getAnalysisProgress(item.status)
   const cfg = item.verdict ? VERDICT_CONFIG[item.verdict] : null
 
@@ -63,8 +64,7 @@ export function AnalysisItem({ item }: AnalysisItemProps) {
         className={cn(
           "group relative flex cursor-pointer items-center gap-4 rounded-2xl border bg-card p-3 transition-all duration-200",
           "hover:shadow-md",
-          isAnalyzing && "border-primary/40",
-          isError && "border-destructive/40"
+          isAnalyzing && "border-primary/40"
         )}
         onClick={openDrawer}
         role="button"
@@ -132,10 +132,18 @@ export function AnalysisItem({ item }: AnalysisItemProps) {
                 </span>
                 <Progress value={progress} className="h-1.5 w-24" />
               </div>
-            ) : isError ? (
-              <span className="text-sm text-destructive">
-                Erreur d&apos;analyse
-              </span>
+            ) : isFailed ? (
+              <div className="min-w-0 space-y-0.5">
+                {item.message ? (
+                  <p className="truncate text-sm text-destructive/70">
+                    {item.message}
+                  </p>
+                ) : (
+                  <p className="text-sm text-destructive">
+                    Erreur d&apos;analyse
+                  </p>
+                )}
+              </div>
             ) : (
               <span className="text-sm text-muted-foreground">
                 En file d&apos;attente…
@@ -156,6 +164,11 @@ export function AnalysisItem({ item }: AnalysisItemProps) {
               aria-label="Analyse en cours"
             >
               <Loader2 className="size-5 animate-spin text-primary" />
+            </span>
+          ) : isFailed ? (
+            <span className="inline-flex items-center gap-1 rounded-full bg-destructive/10 px-2.5 py-1 text-[0.625rem] font-medium text-destructive">
+              <CircleAlert className="size-3" />
+              Échoué
             </span>
           ) : null}
         </div>

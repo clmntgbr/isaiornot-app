@@ -21,6 +21,13 @@ export interface AnalysisCompletedEvent {
   signals?: Signal[]
 }
 
+export interface AnalysisFailedEvent {
+  type: "analysis_failed"
+  analysisId: string
+  userId?: string
+  message?: string
+}
+
 export interface SubscriptionUpdatedEvent {
   type: "subscription_updated"
   userId?: string
@@ -39,6 +46,7 @@ export interface PaymentFailedEvent {
 export type UserStreamEvent =
   | AnalysisStartedEvent
   | AnalysisCompletedEvent
+  | AnalysisFailedEvent
   | SubscriptionUpdatedEvent
   | PaymentSucceededEvent
   | PaymentFailedEvent
@@ -51,16 +59,17 @@ export function isUserStreamEvent(value: unknown): value is UserStreamEvent {
   return (
     type === "analysis_started" ||
     type === "analysis_completed" ||
+    type === "analysis_failed" ||
     type === "subscription_updated" ||
     type === "payment_succeeded" ||
     type === "payment_failed"
   )
 }
 
-export function shouldRefetchAnalyses(
-  event: UserStreamEvent
-): event is AnalysisCompletedEvent {
-  return event.type === "analysis_completed"
+export function shouldRefetchAnalyses(event: UserStreamEvent): boolean {
+  return (
+    event.type === "analysis_completed" || event.type === "analysis_failed"
+  )
 }
 
 export function getUserChannel(userId: string): string {
