@@ -1,6 +1,6 @@
 export function getBackendApiUrl(): string {
   const url =
-    process.env.BACKEND_API_URL ?? process.env.NEXT_PUBLIC_BACKEND_API_URL
+    process.env.NEXT_PUBLIC_BACKEND_API_URL
 
   if (!url) {
     throw new Error("Missing BACKEND_API_URL or NEXT_PUBLIC_BACKEND_API_URL")
