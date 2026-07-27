@@ -1,29 +1,29 @@
 import {
-  AnalysisConfidence,
-  AnalysisVerdict,
+  ScanConfidence,
+  ScanVerdict,
   Signal,
-} from "@/lib/analysis/types"
+} from "@/lib/scan/types"
 
-export interface AnalysisStartedEvent {
-  type: "analysis_started"
-  analysisId: string
+export interface ScanStartedEvent {
+  type: "scan_started"
+  scanId: string
   userId: string
   status: string
   updatedAt: string
 }
 
-export interface AnalysisCompletedEvent {
-  type: "analysis_completed"
-  analysisId: string
+export interface ScanCompletedEvent {
+  type: "scan_completed"
+  scanId: string
   finalScore: number
-  confidence: AnalysisConfidence
-  verdict: AnalysisVerdict
+  confidence: ScanConfidence
+  verdict: ScanVerdict
   signals?: Signal[]
 }
 
-export interface AnalysisFailedEvent {
-  type: "analysis_failed"
-  analysisId: string
+export interface ScanFailedEvent {
+  type: "scan_failed"
+  scanId: string
   userId?: string
   message?: string
 }
@@ -44,9 +44,9 @@ export interface PaymentFailedEvent {
 }
 
 export type UserStreamEvent =
-  | AnalysisStartedEvent
-  | AnalysisCompletedEvent
-  | AnalysisFailedEvent
+  | ScanStartedEvent
+  | ScanCompletedEvent
+  | ScanFailedEvent
   | SubscriptionUpdatedEvent
   | PaymentSucceededEvent
   | PaymentFailedEvent
@@ -57,18 +57,18 @@ export function isUserStreamEvent(value: unknown): value is UserStreamEvent {
   const type = (value as { type?: string }).type
 
   return (
-    type === "analysis_started" ||
-    type === "analysis_completed" ||
-    type === "analysis_failed" ||
+    type === "scan_started" ||
+    type === "scan_completed" ||
+    type === "scan_failed" ||
     type === "subscription_updated" ||
     type === "payment_succeeded" ||
     type === "payment_failed"
   )
 }
 
-export function shouldRefetchAnalyses(event: UserStreamEvent): boolean {
+export function shouldRefetchScans(event: UserStreamEvent): boolean {
   return (
-    event.type === "analysis_completed" || event.type === "analysis_failed"
+    event.type === "scan_completed" || event.type === "scan_failed"
   )
 }
 

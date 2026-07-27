@@ -14,7 +14,7 @@ export async function GET(
 
     const { id } = await params
 
-    const response = await fetch(`${BACKEND_API_URL}/api/analyses/${id}`, {
+    const response = await fetch(`${BACKEND_API_URL}/api/scans/${id}`, {
       method: "GET",
       headers: createAuthHeaders(auth.token, { json: false }),
     })
@@ -29,7 +29,7 @@ export async function GET(
     const data = await response.json()
     return NextResponse.json({ success: true, data })
   } catch (error) {
-    console.error("Analysis error:", error)
+    console.error("Scan error:", error)
     return NextResponse.json({ success: false }, { status: 500 })
   }
 }

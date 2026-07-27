@@ -1,7 +1,7 @@
 import type {
-  AnalysisConfidence,
-  AnalysisStatus,
-  AnalysisVerdict,
+  ScanConfidence,
+  ScanStatus,
+  ScanVerdict,
   Insight,
   InsightKey,
 } from "./types"
@@ -18,7 +18,7 @@ export interface VerdictConfig {
   border: string
 }
 
-export const VERDICT_CONFIG: Record<AnalysisVerdict, VerdictConfig> = {
+export const VERDICT_CONFIG: Record<ScanVerdict, VerdictConfig> = {
   likely_ai: {
     short: "IA",
     label: "Probablement IA",
@@ -51,13 +51,13 @@ export const VERDICT_CONFIG: Record<AnalysisVerdict, VerdictConfig> = {
   },
 }
 
-export const VERDICT_COLOR_VAR: Record<AnalysisVerdict, string> = {
+export const VERDICT_COLOR_VAR: Record<ScanVerdict, string> = {
   likely_real: "--primary",
   uncertain: "--chart-3",
   likely_ai: "--destructive",
 }
 
-export const CONFIDENCE_LABEL: Record<AnalysisConfidence, string> = {
+export const CONFIDENCE_LABEL: Record<ScanConfidence, string> = {
   low: "faible",
   medium: "moyenne",
   high: "élevée",
@@ -111,7 +111,7 @@ export function getInsightEntries(insight: Insight): {
   }))
 }
 
-export function getAnalysisProgress(status: AnalysisStatus): number {
+export function getScanProgress(status: ScanStatus): number {
   if (status === "processing") return 66
   if (status === "pending") return 33
   return 100
@@ -131,12 +131,12 @@ export function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} Mo`
 }
 
-export function getAnalysisDisplayName(analysis: {
+export function getScanDisplayName(scan: {
   filename?: string
   medias: { filename: string; key: string }[]
 }): string {
-  if (analysis.filename) return analysis.filename
-  const first = analysis.medias[0]
+  if (scan.filename) return scan.filename
+  const first = scan.medias[0]
   return first?.filename || first?.key || "Analyse"
 }
 
@@ -144,17 +144,17 @@ export function getMediaThumbnailUrl(mediaId: string): string {
   return `/api/medias/${mediaId}/thumbnail`
 }
 
-export function getAnalysisThumbnail(analysis: {
+export function getScanThumbnail(scan: {
   medias: { id: string }[]
 }): string | undefined {
-  const mediaId = analysis.medias[0]?.id
+  const mediaId = scan.medias[0]?.id
   return mediaId ? getMediaThumbnailUrl(mediaId) : undefined
 }
 
-export function getAnalysisTotalSize(analysis: {
+export function getScanTotalSize(scan: {
   medias: { size?: number }[]
 }): number | undefined {
-  const sizes = analysis.medias
+  const sizes = scan.medias
     .map((media) => media.size)
     .filter((size): size is number => size !== undefined)
 

@@ -1,44 +1,44 @@
 import { Paginate } from "../paginate"
 import {
-  Analysis,
+  Scan,
   GeneratePresignedUploadUrlDetailResponse,
   PresignUploadInput,
 } from "./types"
 
-export const getAnalyses = async (): Promise<Paginate<Analysis>> => {
-  const response = await fetch("/api/analyses", {
+export const getScans = async (): Promise<Paginate<Scan>> => {
+  const response = await fetch("/api/scans", {
     method: "GET",
   })
 
   if (!response.ok) {
-    throw new Error("Failed to fetch analyses")
+    throw new Error("Failed to fetch scans")
   }
 
   return response.json()
 }
 
-export const getAnalysis = async (id: string): Promise<Analysis> => {
-  const response = await fetch(`/api/analyses/${id}`, {
+export const getScan = async (id: string): Promise<Scan> => {
+  const response = await fetch(`/api/scans/${id}`, {
     method: "GET",
   })
 
   if (!response.ok) {
-    throw new Error("Failed to fetch analysis")
+    throw new Error("Failed to fetch scan")
   }
 
-  const payload = (await response.json()) as { data?: Analysis } | Analysis
+  const payload = (await response.json()) as { data?: Scan } | Scan
 
   if ("data" in payload && payload.data) {
     return payload.data
   }
 
-  return payload as Analysis
+  return payload as Scan
 }
 
 export const generatePresignedUploadUrl = async (
   input: PresignUploadInput
 ): Promise<GeneratePresignedUploadUrlDetailResponse> => {
-  const response = await fetch("/api/analyses/presign-upload-url", {
+  const response = await fetch("/api/scans/presign-upload-url", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

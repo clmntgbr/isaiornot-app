@@ -1,7 +1,7 @@
-import { AnalysisStatistics } from "./types"
+import { ScanStatistics } from "./types"
 
-export const getStatistics = async (): Promise<AnalysisStatistics> => {
-  const response = await fetch("/api/analyses/statistics", {
+export const getStatistics = async (): Promise<ScanStatistics> => {
+  const response = await fetch("/api/scans/statistics", {
     method: "GET",
   })
 

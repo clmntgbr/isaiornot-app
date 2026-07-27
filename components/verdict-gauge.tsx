@@ -1,9 +1,9 @@
-import { VERDICT_COLOR_VAR } from "@/lib/analysis/config"
-import { AnalysisVerdict } from "@/lib/analysis/types"
+import { VERDICT_COLOR_VAR } from "@/lib/scan/config"
+import { ScanVerdict } from "@/lib/scan/types"
 import { ScoreGauge } from "./score-gauge"
 
 interface VerdictGaugeProps {
-  verdict: AnalysisVerdict | undefined
+  verdict: ScanVerdict | undefined
   score: number | undefined
 }
 

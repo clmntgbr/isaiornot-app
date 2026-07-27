@@ -4,40 +4,40 @@ import { useCallback, useEffect, useReducer } from "react"
 import { initPaginate } from "../paginate"
 import {
   generatePresignedUploadUrl,
-  getAnalyses,
-  getAnalysis,
+  getScans,
+  getScan,
   uploadFileToPresignedUrl,
 } from "./api"
-import { AnalysisContext } from "./context"
-import { analysisReducer } from "./reducer"
-import { Analysis, AnalysisState } from "./types"
+import { ScanContext } from "./context"
+import { scanReducer } from "./reducer"
+import { Scan, ScanState } from "./types"
 
-const initialState: AnalysisState = {
-  analyses: initPaginate<Analysis>(),
-  isAnalysesLoading: false,
-  analysesError: null,
+const initialState: ScanState = {
+  scans: initPaginate<Scan>(),
+  isScansLoading: false,
+  scansError: null,
 }
 
-export function AnalysisProvider({ children }: { children: React.ReactNode }) {
-  const [state, dispatch] = useReducer(analysisReducer, initialState)
+export function ScanProvider({ children }: { children: React.ReactNode }) {
+  const [state, dispatch] = useReducer(scanReducer, initialState)
 
-  const fetchAnalyses = useCallback(async () => {
+  const fetchScans = useCallback(async () => {
     try {
       dispatch({ type: "GET_ANALYSES_LOADING", payload: true })
-      const analyses = await getAnalyses()
-      dispatch({ type: "GET_ANALYSES", payload: analyses })
+      const scans = await getScans()
+      dispatch({ type: "GET_ANALYSES", payload: scans })
     } catch {
       dispatch({
         type: "GET_ANALYSES_ERROR",
-        payload: "Failed to fetch analyses",
+        payload: "Failed to fetch scans",
       })
     } finally {
       dispatch({ type: "GET_ANALYSES_LOADING", payload: false })
     }
   }, [])
 
-  const fetchAnalysis = useCallback(async (id: string) => {
-    return getAnalysis(id)
+  const fetchScan = useCallback(async (id: string) => {
+    return getScan(id)
   }, [])
 
   const uploadFile = useCallback(
@@ -54,28 +54,28 @@ export function AnalysisProvider({ children }: { children: React.ReactNode }) {
           console.log(progress)
         })
 
-        await fetchAnalyses()
+        await fetchScans()
       } catch {
         console.error("Failed to upload file")
       }
     },
-    [fetchAnalyses]
+    [fetchScans]
   )
 
   useEffect(() => {
-    fetchAnalyses()
-  }, [fetchAnalyses])
+    fetchScans()
+  }, [fetchScans])
 
   return (
-    <AnalysisContext.Provider
+    <ScanContext.Provider
       value={{
         ...state,
-        fetchAnalyses,
-        fetchAnalysis,
+        fetchScans,
+        fetchScan,
         uploadFile,
       }}
     >
       {children}
-    </AnalysisContext.Provider>
+    </ScanContext.Provider>
   )
 }

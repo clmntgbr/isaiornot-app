@@ -1,11 +1,11 @@
 "use client"
 
-import { AnalysisItem } from "@/components/analysis-item"
+import { ScanItem } from "@/components/scan-item"
 import { EmptyComponent } from "@/components/empty"
 import { Header } from "@/components/header"
 import { StatCard } from "@/components/statistic-card"
 import { UploadDropzone } from "@/components/upload-dropzone"
-import { useAnalysis } from "@/lib/analysis/context"
+import { useScan } from "@/lib/scan/context"
 import {
   createUploadFiles,
   revokeUploadFilePreviews,
@@ -16,7 +16,7 @@ import { Bot, ImageIcon, Images, ShieldCheck, TrendingUp } from "lucide-react"
 import { useCallback, useEffect, useRef, useState } from "react"
 
 export default function Page() {
-  const { analyses, uploadFile } = useAnalysis()
+  const { scans, uploadFile } = useScan()
   const { statistics } = useStatistics()
   const [pendingFiles, setPendingFiles] = useState<UploadFile[]>([])
   const [isSending, setIsSending] = useState(false)
@@ -72,8 +72,8 @@ export default function Page() {
       <section className="animate-fade-in grid grid-cols-2 gap-3 sm:grid-cols-4">
         <StatCard
           icon={Images}
-          label="Analyses"
-          value={String(statistics?.analysesCount ?? 0)}
+          label="Scans"
+          value={String(statistics?.scansCount ?? 0)}
           color="text-primary"
         />
         <StatCard
@@ -97,11 +97,11 @@ export default function Page() {
       </section>
 
       <section className="flex flex-col gap-4">
-        {analyses.members.length > 0 ? (
+        {scans.members.length > 0 ? (
           <ul className="flex flex-col gap-3">
-            {analyses.members.map((analysis) => (
-              <li key={analysis.id}>
-                <AnalysisItem item={analysis} />
+            {scans.members.map((scan) => (
+              <li key={scan.id}>
+                <ScanItem item={scan} />
               </li>
             ))}
           </ul>

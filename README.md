@@ -1,6 +1,6 @@
 # Analyse App
 
-Frontend Next.js for AI-generated image detection: upload media, run multi-model analysis, manage subscription plans and usage quotas.
+Frontend Next.js for AI-generated image detection: upload media, run multi-model scan, manage subscription plans and usage quotas.
 
 ## Stack
 
@@ -8,14 +8,14 @@ Frontend Next.js for AI-generated image detection: upload media, run multi-model
 - **React 19** + TypeScript
 - **Clerk** — authentication & route protection
 - **Stripe** — checkout + customer billing portal (via backend)
-- **Centrifugo** — realtime events (analysis completion, payment success/failure)
+- **Centrifugo** — realtime events (scan completion, payment success/failure)
 - **Tailwind CSS 4** + **shadcn/ui**
 - **Sonner** — toasts
 
 ## Features
 
 - Upload & analyse images (presigned upload → backend pipeline)
-- Analysis history + statistics dashboard
+- Scan history + statistics dashboard
 - Realtime updates over Centrifugo (`users:{userId}` channel)
 - Pricing plans (monthly / annually) with Stripe Checkout
 - Subscription page: plan, quota usage gauges, Stripe portal
@@ -70,7 +70,7 @@ App: [http://localhost:3001](http://localhost:3001)
 
 | Route | Description |
 | --- | --- |
-| `/` | Detector: upload + analysis list + stats |
+| `/` | Detector: upload + scan list + stats |
 | `/pricing` | Plan selection → Stripe Checkout |
 | `/subscription` | Current plan, quota usage, Stripe portal |
 | `/subscription/success` | Post-checkout success (auto-redirect ~10s) |
@@ -90,7 +90,7 @@ app/
       success/page.tsx
       cancel/page.tsx
   api/                       # Auth-proxied routes → backend
-    analyses/
+    scans/
     medias/[id]/thumbnail/
     plans/
     realtime/connection/
@@ -106,11 +106,11 @@ components/
   payment-success.tsx
   payment-cancel.tsx
   upload-dropzone.tsx
-  analysis-item.tsx
+  scan-item.tsx
   ui/                        # shadcn primitives
 
 lib/
-  analysis/                  # Analyses state (provider / api / types)
+  scan/                  # Scans state (provider / api / types)
   plan/                      # Plans + pricing helpers
   subscription/              # Subscription state + Stripe helpers
   statistics/
@@ -137,7 +137,7 @@ API routes under `app/api/**` follow the same pattern:
 
 | Event | Action |
 | --- | --- |
-| `analysis_completed` | Refresh analyses + statistics |
+| `scan_completed` | Refresh scans + statistics |
 | `subscription_updated` | Refresh subscription |
 | `payment_succeeded` | Refresh subscription + success toast |
 | `payment_failed` | Refresh subscription + error toast |

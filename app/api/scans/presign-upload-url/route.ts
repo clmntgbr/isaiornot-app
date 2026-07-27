@@ -12,7 +12,7 @@ export async function POST(request: Request) {
     const body = await request.json()
 
     const response = await fetch(
-      `${BACKEND_API_URL}/api/analyses/presign-upload-url`,
+      `${BACKEND_API_URL}/api/scans/presign-upload-url`,
       {
         method: "POST",
         headers: createAuthHeaders(auth.token),

@@ -257,7 +257,7 @@ export function Pricing({ onBack, currentPlanSlug }: PricingPageProps) {
           />
           <InfoTile
             title="Facturation à l'usage"
-            desc="Les analyses non utilisées ne sont pas reportées au mois suivant."
+            desc="Les scans non utilisées ne sont pas reportées au mois suivant."
           />
           <InfoTile
             title="Support inclus"

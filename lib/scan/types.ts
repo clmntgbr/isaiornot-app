@@ -1,8 +1,8 @@
 import { Paginate } from "../paginate"
 
-export type AnalysisVerdict = "likely_ai" | "likely_real" | "uncertain"
-export type AnalysisConfidence = "low" | "medium" | "high" | "unknown"
-export type AnalysisStatus = "pending" | "processing" | "analyzed" | "failed"
+export type ScanVerdict = "likely_ai" | "likely_real" | "uncertain"
+export type ScanConfidence = "low" | "medium" | "high" | "unknown"
+export type ScanStatus = "pending" | "processing" | "analyzed" | "failed"
 
 export interface Insight {
   noise: number
@@ -16,7 +16,7 @@ export type InsightKey = keyof Insight
 export interface Signal {
   name: string
   score: number
-  confidence: AnalysisConfidence
+  confidence: ScanConfidence
   details: string[]
 }
 
@@ -26,7 +26,7 @@ export interface Media {
   filename: string
   thumbnail: string
   contentType: string
-  status: AnalysisStatus
+  status: ScanStatus
   signals?: Signal[]
   insight?: Insight
   size?: number
@@ -34,14 +34,14 @@ export interface Media {
   updatedAt: string
 }
 
-export interface Analysis {
+export interface Scan {
   id: string
-  status: AnalysisStatus
+  status: ScanStatus
   statuses?: string[]
   message?: string | null
   finalScore?: number
-  confidence?: AnalysisConfidence
-  verdict?: AnalysisVerdict
+  confidence?: ScanConfidence
+  verdict?: ScanVerdict
   filename?: string
   thumbnail?: string
   insight?: Insight
@@ -59,13 +59,13 @@ export interface GeneratePresignedUploadUrlDetailResponse {
   uploadUrl: string
 }
 
-export interface AnalysisState {
-  analyses: Paginate<Analysis>
-  isAnalysesLoading: boolean
-  analysesError: string | null
+export interface ScanState {
+  scans: Paginate<Scan>
+  isScansLoading: boolean
+  scansError: string | null
 }
 
-export type AnalysisAction =
-  | { type: "GET_ANALYSES"; payload: Paginate<Analysis> }
+export type ScanAction =
+  | { type: "GET_ANALYSES"; payload: Paginate<Scan> }
   | { type: "GET_ANALYSES_ERROR"; payload: string }
   | { type: "GET_ANALYSES_LOADING"; payload: boolean }

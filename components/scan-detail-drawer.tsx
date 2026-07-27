@@ -2,43 +2,43 @@
 
 import { Drawer, DrawerContent, DrawerTitle } from "@/components/ui/drawer"
 import {
-  getAnalysisDisplayName,
+  getScanDisplayName,
   getInsightEntries,
-} from "@/lib/analysis/config"
-import { useAnalysis } from "@/lib/analysis/context"
-import type { Analysis } from "@/lib/analysis/types"
+} from "@/lib/scan/config"
+import { useScan } from "@/lib/scan/context"
+import type { Scan } from "@/lib/scan/types"
 import { CircleAlert } from "lucide-react"
 import { useEffect, useState } from "react"
 import { InsightRow } from "./insight-row"
 import { VerdictGauge } from "./verdict-gauge"
 
-interface AnalysisDetailDrawerProps {
+interface ScanDetailDrawerProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  analysisId: string
+  scanId: string
 }
 
-export function AnalysisDetailDrawer({
+export function ScanDetailDrawer({
   open,
   onOpenChange,
-  analysisId,
-}: AnalysisDetailDrawerProps) {
-  const { fetchAnalysis } = useAnalysis()
-  const [item, setItem] = useState<Analysis | null>(null)
+  scanId,
+}: ScanDetailDrawerProps) {
+  const { fetchScan } = useScan()
+  const [item, setItem] = useState<Scan | null>(null)
 
   useEffect(() => {
-    if (!open || !analysisId) return
+    if (!open || !scanId) return
 
     let cancelled = false
 
-    fetchAnalysis(analysisId).then((analysis) => {
-      if (!cancelled) setItem(analysis)
+    fetchScan(scanId).then((scan) => {
+      if (!cancelled) setItem(scan)
     })
 
     return () => {
       cancelled = true
     }
-  }, [open, analysisId, fetchAnalysis])
+  }, [open, scanId, fetchScan])
 
   const insights = item?.insight ? getInsightEntries(item.insight) : []
   const isFailed = item?.status === "failed"
@@ -47,7 +47,7 @@ export function AnalysisDetailDrawer({
     <Drawer open={open} onOpenChange={onOpenChange} direction="right">
       <DrawerContent className="flex h-full w-[40vw]! max-w-[40vw]! flex-col gap-0 overflow-hidden p-6">
         <DrawerTitle className="sr-only">
-          {item ? getAnalysisDisplayName(item) : "Détail de l'analyse"}
+          {item ? getScanDisplayName(item) : "Détail de l'analyse"}
         </DrawerTitle>
         {item &&
           (isFailed ? (

@@ -9,10 +9,13 @@ export async function GET() {
     const auth = await requireAuth()
     if ("error" in auth) return auth.error
 
-    const response = await fetch(`${BACKEND_API_URL}/api/analyses/statistics`, {
-      method: "GET",
-      headers: createAuthHeaders(auth.token),
-    })
+    const response = await fetch(
+      `${BACKEND_API_URL}/api/scans?page=1&limit=10&sortBy=created_at&orderBy=desc`,
+      {
+        method: "GET",
+        headers: createAuthHeaders(auth.token),
+      }
+    )
 
     if (!response.ok) {
       return NextResponse.json(

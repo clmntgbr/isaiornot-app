@@ -1,6 +1,6 @@
 "use client"
 
-import { AnalysisDetailDrawer } from "@/components/analysis-detail-drawer"
+import { ScanDetailDrawer } from "@/components/scan-detail-drawer"
 import { MediaThumbnail } from "@/components/media-thumbnail"
 import { Progress } from "@/components/ui/progress"
 import {
@@ -8,13 +8,13 @@ import {
   VERDICT_COLOR_VAR,
   VERDICT_CONFIG,
   formatBytes,
-  getAnalysisDisplayName,
-  getAnalysisProgress,
-  getAnalysisThumbnail,
-  getAnalysisTotalSize,
+  getScanDisplayName,
+  getScanProgress,
+  getScanThumbnail,
+  getScanTotalSize,
   isVideoMedia,
-} from "@/lib/analysis/config"
-import { Analysis, AnalysisVerdict } from "@/lib/analysis/types"
+} from "@/lib/scan/config"
+import { Scan, ScanVerdict } from "@/lib/scan/types"
 import { cn } from "@/lib/utils"
 import {
   Bot,
@@ -35,16 +35,16 @@ const ICONS = {
   bot: Bot,
 }
 
-interface AnalysisItemProps {
-  item: Analysis
+interface ScanItemProps {
+  item: Scan
 }
 
-export function AnalysisItem({ item }: AnalysisItemProps) {
+export function ScanItem({ item }: ScanItemProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const primaryMedia = item.medias[0]
-  const displayName = getAnalysisDisplayName(item)
-  const thumbnail = getAnalysisThumbnail(item)
-  const size = getAnalysisTotalSize(item)
+  const displayName = getScanDisplayName(item)
+  const thumbnail = getScanThumbnail(item)
+  const size = getScanTotalSize(item)
   const isVideo = isVideoMedia(
     primaryMedia?.filename || primaryMedia?.key || displayName,
     primaryMedia?.contentType
@@ -52,7 +52,7 @@ export function AnalysisItem({ item }: AnalysisItemProps) {
   const isComplete = item.status === "analyzed" && item.verdict
   const isAnalyzing = item.status === "pending" || item.status === "processing"
   const isFailed = item.status === "failed"
-  const progress = getAnalysisProgress(item.status)
+  const progress = getScanProgress(item.status)
   const cfg = item.verdict ? VERDICT_CONFIG[item.verdict] : null
 
   const canOpenDrawer = isComplete || isFailed
@@ -137,7 +137,7 @@ export function AnalysisItem({ item }: AnalysisItemProps) {
                     {item.message}
                   </p>
                 ) : (
-                  <p className="text-sm text-destructive">Analysis failed</p>
+                  <p className="text-sm text-destructive">Scan failed</p>
                 )}
               </div>
             ) : (
@@ -157,7 +157,7 @@ export function AnalysisItem({ item }: AnalysisItemProps) {
           ) : isAnalyzing ? (
             <span
               className="inline-flex size-11 items-center justify-center rounded-full bg-primary/10"
-              aria-label="Analysis in progress"
+              aria-label="Scan in progress"
             >
               <Loader2 className="size-5 animate-spin text-primary" />
             </span>
@@ -170,8 +170,8 @@ export function AnalysisItem({ item }: AnalysisItemProps) {
         </div>
       </div>
 
-      <AnalysisDetailDrawer
-        analysisId={item.id}
+      <ScanDetailDrawer
+        scanId={item.id}
         open={drawerOpen}
         onOpenChange={setDrawerOpen}
       />
@@ -179,7 +179,7 @@ export function AnalysisItem({ item }: AnalysisItemProps) {
   )
 }
 
-function VerdictBadge({ verdict }: { verdict: AnalysisVerdict }) {
+function VerdictBadge({ verdict }: { verdict: ScanVerdict }) {
   const cfg = VERDICT_CONFIG[verdict]
   const Icon = ICONS[cfg.icon]
 
@@ -203,7 +203,7 @@ function ScorePill({
   verdict,
 }: {
   score: number
-  verdict: AnalysisVerdict
+  verdict: ScanVerdict
 }) {
   const colorVar = VERDICT_COLOR_VAR[verdict]
 
