@@ -16,6 +16,7 @@ import { Metadata } from "next"
 import { Geist_Mono, Roboto, Sora } from "next/font/google"
 import Link from "next/link"
 import "./globals.css"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const roboto = Roboto({ subsets: ["latin"], variable: "--font-sans" })
 
@@ -49,6 +50,7 @@ export default function RootLayout({
       )}
     >
       <body>
+        <SpeedInsights/>
         <ClerkProvider>
           <ThemeProvider>
             <header className="flex h-16 items-center justify-end gap-4 p-4">
