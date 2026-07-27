@@ -1,6 +1,5 @@
 import type {
   ScanConfidence,
-  ScanStatus,
   ScanVerdict,
   Insight,
   InsightKey,
@@ -159,12 +158,6 @@ export function getInsightEntries(insight: Insight): {
     description: INSIGHT_CONFIG[key].description,
     help: INSIGHT_CONFIG[key].help,
   }))
-}
-
-export function getScanProgress(status: ScanStatus): number {
-  if (status === "processing") return 66
-  if (status === "pending") return 33
-  return 100
 }
 
 export function isVideoMedia(

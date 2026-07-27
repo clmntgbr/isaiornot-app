@@ -2,14 +2,12 @@
 
 import { ScanDetailDrawer } from "@/components/scan-detail-drawer"
 import { MediaThumbnail } from "@/components/media-thumbnail"
-import { Progress } from "@/components/ui/progress"
 import {
   CONFIDENCE_CONFIG,
   VERDICT_COLOR_VAR,
   VERDICT_CONFIG,
   formatBytes,
   getScanDisplayName,
-  getScanProgress,
   getScanThumbnail,
   getScanTotalSize,
   isVideoMedia,
@@ -61,13 +59,12 @@ export function ScanItem({ item }: ScanItemProps) {
     primaryMedia?.filename || primaryMedia?.key || displayName,
     primaryMedia?.contentType
   )
-  const isComplete = item.status === "completed" && item.verdict
-  const isAnalyzing = item.status === "pending" || item.status === "processing"
+  const isComplete = item.status === "completed"
   const isFailed = item.status === "failed"
-  const progress = getScanProgress(item.status)
+  const isAnalyzing = !isComplete && !isFailed
   const cfg = item.verdict ? VERDICT_CONFIG[item.verdict] : null
 
-  const canOpenDrawer = isComplete || isFailed
+  const canOpenDrawer = (isComplete && Boolean(item.verdict)) || isFailed
 
   const openDrawer = () => {
     if (canOpenDrawer) setDrawerOpen(true)
@@ -80,8 +77,7 @@ export function ScanItem({ item }: ScanItemProps) {
           "group relative flex items-center gap-4 rounded-2xl border bg-card p-3",
           "transition-all duration-300 ease-out",
           canOpenDrawer &&
-            "cursor-pointer hover:-translate-y-1 hover:shadow-lg active:translate-y-0 active:shadow-md",
-          isAnalyzing && "border-primary/40 bg-primary/5"
+            "cursor-pointer hover:-translate-y-1 hover:shadow-sm active:translate-y-0 active:shadow-none"
         )}
         onClick={openDrawer}
         role="button"
@@ -142,21 +138,10 @@ export function ScanItem({ item }: ScanItemProps) {
                   <ConfidenceBadge confidence={item.confidence} />
                 )}
               </>
-            ) : isAnalyzing ? (
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-primary">
-                  {item.status === "processing"
-                    ? "Analyse en cours…"
-                    : "Préparation…"}
-                </span>
-                <Progress value={progress} className="h-1.5 w-24" />
-              </div>
             ) : isFailed ? (
               <ErrorBadge message={item.message} />
             ) : (
-              <span className="text-sm text-muted-foreground">
-                Processing...
-              </span>
+              <AnalyzingBadge />
             )}
           </div>
         </div>
@@ -167,19 +152,19 @@ export function ScanItem({ item }: ScanItemProps) {
               <Check className="size-3" />
               Completed
             </span>
-          ) : isAnalyzing ? (
-            <span
-              className="inline-flex size-11 items-center justify-center rounded-full bg-primary/10"
-              aria-label="Scan in progress"
-            >
-              <Loader2 className="size-5 animate-spin text-primary" />
-            </span>
           ) : isFailed ? (
             <span className="inline-flex items-center gap-1 rounded-full bg-destructive/10 px-2.5 py-1 text-xs text-destructive">
               <CircleAlert className="size-3" />
               Failed
             </span>
-          ) : null}
+          ) : (
+            <span
+              className="inline-flex size-11 items-center justify-center rounded-full bg-primary/10"
+              aria-label="Analyse en cours"
+            >
+              <Loader2 className="size-5 animate-spin text-primary" />
+            </span>
+          )}
 
           {canOpenDrawer && (
             <span
@@ -218,6 +203,15 @@ function ErrorBadge({ message }: { message?: string | null }) {
     >
       <CircleAlert className="size-3 shrink-0" />
       <span className="truncate">{message ?? "Analyse échouée"}</span>
+    </span>
+  )
+}
+
+function AnalyzingBadge() {
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 text-xs text-primary">
+      <Loader2 className="size-3 shrink-0 animate-spin" />
+      Analyse en cours…
     </span>
   )
 }
