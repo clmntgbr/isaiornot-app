@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils"
 import {
   Bot,
   Check,
+  ChevronRight,
   CircleAlert,
   FileVideo,
   HardDrive,
@@ -76,9 +77,11 @@ export function ScanItem({ item }: ScanItemProps) {
     <>
       <div
         className={cn(
-          "group relative flex items-center gap-4 rounded-2xl border bg-card p-3 transition-all duration-200",
-          canOpenDrawer && "cursor-pointer hover:shadow-md",
-          isAnalyzing && "border-primary/40"
+          "group relative flex items-center gap-4 rounded-2xl border bg-card p-3",
+          "transition-all duration-300 ease-out",
+          canOpenDrawer &&
+            "cursor-pointer hover:-translate-y-1 hover:shadow-lg active:translate-y-0 active:shadow-md",
+          isAnalyzing && "border-primary/40 bg-primary/5"
         )}
         onClick={openDrawer}
         role="button"
@@ -90,9 +93,22 @@ export function ScanItem({ item }: ScanItemProps) {
           }
         }}
       >
-        <div className="relative flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-secondary">
+        <div
+          className={cn(
+            "relative flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-secondary",
+            "transition-transform duration-300 ease-out",
+            canOpenDrawer && "group-hover:scale-[1.04]"
+          )}
+        >
           {thumbnail ? (
-            <MediaThumbnail src={thumbnail} alt={`Aperçu de ${displayName}`} />
+            <MediaThumbnail
+              src={thumbnail}
+              alt={`Aperçu de ${displayName}`}
+              className={cn(
+                "transition-transform duration-500 ease-out",
+                canOpenDrawer && "group-hover:scale-110"
+              )}
+            />
           ) : isVideo ? (
             <div className="flex size-full flex-col items-center justify-center gap-1 text-muted-foreground">
               <FileVideo className="size-5" />
@@ -164,6 +180,15 @@ export function ScanItem({ item }: ScanItemProps) {
               Failed
             </span>
           ) : null}
+
+          {canOpenDrawer && (
+            <span
+              className="flex size-8 items-center justify-center rounded-full text-muted-foreground opacity-40 transition-all duration-300 ease-out group-hover:translate-x-1 group-hover:opacity-100"
+              aria-hidden="true"
+            >
+              <ChevronRight className="size-4" />
+            </span>
+          )}
         </div>
       </div>
 

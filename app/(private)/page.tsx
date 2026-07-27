@@ -3,6 +3,7 @@
 import { ScanItem } from "@/components/scan-item"
 import { EmptyComponent } from "@/components/empty"
 import { Header } from "@/components/header"
+import { ScansPagination } from "@/components/scans-pagination"
 import { StatCard } from "@/components/statistic-card"
 import { UploadDropzone } from "@/components/upload-dropzone"
 import { useScan } from "@/lib/scan/context"
@@ -16,7 +17,7 @@ import { Bot, ImageIcon, Images, ShieldCheck, TrendingUp } from "lucide-react"
 import { useCallback, useEffect, useRef, useState } from "react"
 
 export default function Page() {
-  const { scans, uploadFile } = useScan()
+  const { scans, isScansLoading, fetchScans, uploadFile } = useScan()
   const { statistics } = useStatistics()
   const [pendingFiles, setPendingFiles] = useState<UploadFile[]>([])
   const [isSending, setIsSending] = useState(false)
@@ -58,6 +59,13 @@ export default function Page() {
     setPendingFiles([])
   }, [isSending, pendingFiles])
 
+  const handlePageChange = useCallback(
+    (page: number) => {
+      void fetchScans(page)
+    },
+    [fetchScans]
+  )
+
   return (
     <div className="container mx-auto flex max-w-6xl flex-col gap-8 p-4">
       <Header />
@@ -98,13 +106,21 @@ export default function Page() {
 
       <section className="flex flex-col gap-4">
         {scans.members.length > 0 ? (
-          <ul className="flex flex-col gap-3">
-            {scans.members.map((scan) => (
-              <li key={scan.id}>
-                <ScanItem item={scan} />
-              </li>
-            ))}
-          </ul>
+          <>
+            <ul className="flex flex-col gap-3">
+              {scans.members.map((scan) => (
+                <li key={scan.id}>
+                  <ScanItem item={scan} />
+                </li>
+              ))}
+            </ul>
+            <ScansPagination
+              page={scans.page}
+              totalPages={scans.totalPages}
+              onPageChange={handlePageChange}
+              disabled={isScansLoading}
+            />
+          </>
         ) : (
           <EmptyComponent
             title="Aucune analyse"

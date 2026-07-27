@@ -1,12 +1,33 @@
-import { Paginate } from "../paginate"
+import { Paginate, PaginateQuery } from "../paginate"
 import {
   Scan,
   GeneratePresignedUploadUrlDetailResponse,
   PresignUploadInput,
 } from "./types"
 
-export const getScans = async (): Promise<Paginate<Scan>> => {
-  const response = await fetch("/api/scans", {
+const DEFAULT_SCAN_QUERY: Required<
+  Pick<PaginateQuery, "page" | "limit" | "sortBy" | "orderBy">
+> = {
+  page: 1,
+  limit: 10,
+  sortBy: "created_at",
+  orderBy: "desc",
+}
+
+export const getScans = async (
+  query: PaginateQuery = {}
+): Promise<Paginate<Scan>> => {
+  const params = new URLSearchParams({
+    page: String(query.page ?? DEFAULT_SCAN_QUERY.page),
+    limit: String(query.limit ?? DEFAULT_SCAN_QUERY.limit),
+    sortBy: query.sortBy ?? DEFAULT_SCAN_QUERY.sortBy,
+    orderBy: query.orderBy ?? DEFAULT_SCAN_QUERY.orderBy,
+  })
+
+  if (query.search) params.set("search", query.search)
+  if (query.tags) params.set("tags", query.tags)
+
+  const response = await fetch(`/api/scans?${params}`, {
     method: "GET",
   })
 

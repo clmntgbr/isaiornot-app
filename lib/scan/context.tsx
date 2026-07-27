@@ -4,7 +4,7 @@ import { createContext, useContext } from "react"
 import { Scan, ScanState } from "./types"
 
 export interface ScanContextType extends ScanState {
-  fetchScans: () => Promise<void>
+  fetchScans: (page?: number) => Promise<void>
   fetchScan: (id: string) => Promise<Scan>
   uploadFile: (file: File) => Promise<void>
 }

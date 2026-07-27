@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useReducer } from "react"
+import { useCallback, useEffect, useReducer, useRef } from "react"
 import { initPaginate } from "../paginate"
 import {
   generatePresignedUploadUrl,
@@ -12,6 +12,8 @@ import { ScanContext } from "./context"
 import { scanReducer } from "./reducer"
 import { Scan, ScanState } from "./types"
 
+const SCANS_PAGE_LIMIT = 10
+
 const initialState: ScanState = {
   scans: initPaginate<Scan>(),
   isScansLoading: false,
@@ -20,11 +22,19 @@ const initialState: ScanState = {
 
 export function ScanProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(scanReducer, initialState)
+  const pageRef = useRef(1)
 
-  const fetchScans = useCallback(async () => {
+  const fetchScans = useCallback(async (page = pageRef.current) => {
+    pageRef.current = page
+
     try {
       dispatch({ type: "GET_ANALYSES_LOADING", payload: true })
-      const scans = await getScans()
+      const scans = await getScans({
+        page,
+        limit: SCANS_PAGE_LIMIT,
+        sortBy: "created_at",
+        orderBy: "desc",
+      })
       dispatch({ type: "GET_ANALYSES", payload: scans })
     } catch {
       dispatch({
@@ -54,7 +64,7 @@ export function ScanProvider({ children }: { children: React.ReactNode }) {
           console.log(progress)
         })
 
-        await fetchScans()
+        await fetchScans(1)
       } catch {
         console.error("Failed to upload file")
       }
@@ -63,7 +73,7 @@ export function ScanProvider({ children }: { children: React.ReactNode }) {
   )
 
   useEffect(() => {
-    fetchScans()
+    void fetchScans(1)
   }, [fetchScans])
 
   return (
