@@ -198,7 +198,7 @@ function SubscriptionContent({
               </span>
             </div>
 
-            <p className="mt-6 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+            <p className="mt-6 text-sm text-muted-foreground">
               Votre plan
             </p>
             <div className="mt-1 flex flex-wrap items-baseline gap-3">
@@ -301,7 +301,7 @@ function SubscriptionContent({
             <DetailRow
               icon={TrendingUp}
               label="Pipeline"
-              value={quota.fullPipeline ? "Complet" : "Basique"}
+              value={quota.fullPipeline ? "Complet" : "Basique (metadata & heuristiques)"}
             />
             <DetailRow
               icon={Sparkles}

@@ -57,6 +57,56 @@ export const VERDICT_COLOR_VAR: Record<ScanVerdict, string> = {
   likely_ai: "--destructive",
 }
 
+export type ConfidenceIcon =
+  | "signal-high"
+  | "signal-medium"
+  | "signal-low"
+  | "help-circle"
+
+export interface ConfidenceConfig {
+  short: string
+  label: string
+  icon: ConfidenceIcon
+  bg: string
+  color: string
+  border: string
+}
+
+export const CONFIDENCE_CONFIG: Record<ScanConfidence, ConfidenceConfig> = {
+  high: {
+    short: "Élevée",
+    label: "Confiance élevée",
+    icon: "signal-high",
+    bg: "bg-emerald-500/10",
+    color: "text-emerald-700 dark:text-emerald-400",
+    border: "border-emerald-500/20",
+  },
+  medium: {
+    short: "Moyenne",
+    label: "Confiance moyenne",
+    icon: "signal-medium",
+    bg: "bg-amber-500/10",
+    color: "text-amber-700 dark:text-amber-400",
+    border: "border-amber-500/20",
+  },
+  low: {
+    short: "Faible",
+    label: "Confiance faible",
+    icon: "signal-low",
+    bg: "bg-orange-500/10",
+    color: "text-orange-700 dark:text-orange-400",
+    border: "border-orange-500/20",
+  },
+  unknown: {
+    short: "Inconnue",
+    label: "Confiance inconnue",
+    icon: "help-circle",
+    bg: "bg-muted",
+    color: "text-muted-foreground",
+    border: "border-border",
+  },
+}
+
 export const CONFIDENCE_LABEL: Record<ScanConfidence, string> = {
   low: "faible",
   medium: "moyenne",

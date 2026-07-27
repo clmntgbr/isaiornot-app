@@ -92,7 +92,7 @@ export function getQuotaFeatures(quota: Quota): string[] {
     features.push(`Vidéos jusqu'à ${formatBytes(quota.maxFileSizeVideo)}`)
   }
 
-  features.push(quota.fullPipeline ? "Pipeline complet" : "Pipeline standard")
+  features.push(quota.fullPipeline ? "Pipeline complet" : "Pipeline standard (metadata & heuristiques)")
   features.push(`Historique ${formatRetention(quota.historyRetention)}`)
 
   return features

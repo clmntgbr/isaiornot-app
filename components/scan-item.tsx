@@ -4,7 +4,7 @@ import { ScanDetailDrawer } from "@/components/scan-detail-drawer"
 import { MediaThumbnail } from "@/components/media-thumbnail"
 import { Progress } from "@/components/ui/progress"
 import {
-  CONFIDENCE_LABEL,
+  CONFIDENCE_CONFIG,
   VERDICT_COLOR_VAR,
   VERDICT_CONFIG,
   formatBytes,
@@ -14,25 +14,36 @@ import {
   getScanTotalSize,
   isVideoMedia,
 } from "@/lib/scan/config"
-import { Scan, ScanVerdict } from "@/lib/scan/types"
+import { Scan, ScanConfidence, ScanVerdict } from "@/lib/scan/types"
 import { cn } from "@/lib/utils"
 import {
   Bot,
   Check,
   CircleAlert,
   FileVideo,
+  HardDrive,
   HelpCircle,
   Loader2,
   ShieldCheck,
+  SignalHigh,
+  SignalLow,
+  SignalMedium,
   User,
 } from "lucide-react"
 import { useState } from "react"
 
-const ICONS = {
+const VERDICT_ICONS = {
   "shield-check": ShieldCheck,
   user: User,
   "help-circle": HelpCircle,
   bot: Bot,
+}
+
+const CONFIDENCE_ICONS = {
+  "signal-high": SignalHigh,
+  "signal-medium": SignalMedium,
+  "signal-low": SignalLow,
+  "help-circle": HelpCircle,
 }
 
 interface ScanItemProps {
@@ -103,11 +114,7 @@ export function ScanItem({ item }: ScanItemProps) {
           </p>
 
           <div className="flex flex-wrap items-center gap-2">
-            {size !== undefined && (
-              <span className="text-sm text-muted-foreground tabular-nums">
-                {formatBytes(size)}
-              </span>
-            )}
+            {size !== undefined && <SizeBadge size={size} />}
             {isComplete &&
             cfg &&
             item.verdict &&
@@ -116,9 +123,7 @@ export function ScanItem({ item }: ScanItemProps) {
                 <VerdictBadge verdict={item.verdict} />
                 <ScorePill score={item.finalScore} verdict={item.verdict} />
                 {item.confidence && (
-                  <span className="text-sm text-muted-foreground tabular-nums">
-                    Confiance {CONFIDENCE_LABEL[item.confidence]}
-                  </span>
+                  <ConfidenceBadge confidence={item.confidence} />
                 )}
               </>
             ) : isAnalyzing ? (
@@ -179,9 +184,18 @@ export function ScanItem({ item }: ScanItemProps) {
   )
 }
 
+function SizeBadge({ size }: { size: number }) {
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2 py-0.5 text-[0.625rem] font-semibold text-muted-foreground tabular-nums">
+      <HardDrive className="size-3" />
+      {formatBytes(size)}
+    </span>
+  )
+}
+
 function VerdictBadge({ verdict }: { verdict: ScanVerdict }) {
   const cfg = VERDICT_CONFIG[verdict]
-  const Icon = ICONS[cfg.icon]
+  const Icon = VERDICT_ICONS[cfg.icon]
 
   return (
     <span
@@ -194,6 +208,26 @@ function VerdictBadge({ verdict }: { verdict: ScanVerdict }) {
     >
       <Icon className="size-3" />
       {cfg.short}
+    </span>
+  )
+}
+
+function ConfidenceBadge({ confidence }: { confidence: ScanConfidence }) {
+  const cfg = CONFIDENCE_CONFIG[confidence]
+  const Icon = CONFIDENCE_ICONS[cfg.icon]
+
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[0.625rem] font-semibold",
+        cfg.bg,
+        cfg.color,
+        cfg.border
+      )}
+      title={cfg.label}
+    >
+      <Icon className="size-3" />
+      {cfg.label}
     </span>
   )
 }
