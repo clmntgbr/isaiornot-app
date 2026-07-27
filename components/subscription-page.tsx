@@ -1,6 +1,5 @@
 "use client"
 
-import { PageHero } from "@/components/page-hero"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -12,19 +11,23 @@ import {
 } from "@/lib/plan/pricing"
 import { createBillingPortalSession } from "@/lib/subscription/api"
 import { useSubscription } from "@/lib/subscription/context"
+import type { Subscription } from "@/lib/subscription/types"
 import { cn } from "@/lib/utils"
 import {
+  ArrowUpRight,
   CalendarClock,
   CreditCard,
   ExternalLink,
   FileStack,
   HardDrive,
+  Image as ImageIcon,
   Loader2,
   Sparkles,
+  Timer,
   TrendingUp,
   Video,
 } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useEffect, useState, type ComponentType } from "react"
 import { toast } from "sonner"
 
 const STATUS_LABELS: Record<string, string> = {
@@ -81,30 +84,85 @@ export function SubscriptionPage({
     }
   }
 
-  if (isLoading && !subscription) {
-    return (
-      <div className="container mx-auto flex max-w-6xl flex-col items-center gap-4 px-4 py-32">
-        <Loader2 className="size-8 animate-spin text-primary" />
-        <p className="text-sm text-muted-foreground">
-          Chargement de votre abonnement…
+  return (
+    <div className="mx-auto max-w-5xl px-4 py-10 sm:py-14">
+      <div className="mb-8">
+        <h1 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+          Mon abonnement
+        </h1>
+        <p className="mt-2 text-muted-foreground">
+          Votre plan, votre consommation et votre facturation.
         </p>
       </div>
-    )
-  }
 
-  const plan = subscription?.effectivePlan ?? subscription?.plan ?? null
+      {isLoading && !subscription ? (
+        <LoadingState />
+      ) : !subscription || !(subscription.effectivePlan ?? subscription.plan) ? (
+        <EmptyState onGoPricing={onGoPricing} />
+      ) : (
+        <SubscriptionContent
+          subscription={subscription}
+          portalLoading={portalLoading}
+          onOpenPortal={handleOpenPortal}
+          onGoPricing={onGoPricing}
+          onGoDetect={onGoDetect}
+        />
+      )}
+    </div>
+  )
+}
 
-  if (!subscription || !plan) {
-    return (
-      <div className="container mx-auto flex max-w-6xl flex-col items-center gap-4 px-4 py-32 text-center">
-        <p className="text-sm text-muted-foreground">
-          Aucun abonnement trouvé.
-        </p>
-        <Button onClick={onGoPricing}>Voir les plans</Button>
+function LoadingState() {
+  return (
+    <div className="space-y-6" aria-busy="true" aria-live="polite">
+      <div className="h-56 w-full animate-pulse rounded-xl bg-muted" />
+      <div className="grid gap-4 sm:grid-cols-3">
+        <div className="h-40 animate-pulse rounded-xl bg-muted" />
+        <div className="h-40 animate-pulse rounded-xl bg-muted" />
+        <div className="h-40 animate-pulse rounded-xl bg-muted" />
       </div>
-    )
-  }
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div className="h-64 animate-pulse rounded-xl bg-muted" />
+        <div className="h-64 animate-pulse rounded-xl bg-muted" />
+      </div>
+      <p className="sr-only">Chargement de votre abonnement…</p>
+    </div>
+  )
+}
 
+function EmptyState({ onGoPricing }: { onGoPricing: () => void }) {
+  return (
+    <Card className="flex flex-col items-center gap-4 p-12 text-center">
+      <div className="flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
+        <CreditCard className="size-6" aria-hidden="true" />
+      </div>
+      <div>
+        <h2 className="font-display text-lg font-semibold text-foreground">
+          Aucun abonnement actif
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Choisissez un forfait pour débloquer les analyses.
+        </p>
+      </div>
+      <Button onClick={onGoPricing}>Voir les plans</Button>
+    </Card>
+  )
+}
+
+function SubscriptionContent({
+  subscription,
+  portalLoading,
+  onOpenPortal,
+  onGoPricing,
+  onGoDetect,
+}: {
+  subscription: Subscription
+  portalLoading: boolean
+  onOpenPortal: () => void
+  onGoPricing: () => void
+  onGoDetect: () => void
+}) {
+  const plan = subscription.effectivePlan ?? subscription.plan!
   const quota = plan.quota
   const usage = subscription.quotaUsage
 
@@ -117,143 +175,126 @@ export function SubscriptionPage({
   const imagesMax = usage?.imagesMax ?? quota.maxImagesPerMonth
   const videosUsed = usage?.videosUsed ?? 0
   const videosMax = usage?.videosMax ?? quota.maxVideosPerMonth
-
   const hasPortal = Boolean(subscription.stripeCustomerId)
 
   return (
-    <div className="container mx-auto max-w-6xl p-4 pb-20">
-      <PageHero
-        badge="Votre espace abonnement"
-        title="Gérez votre"
-        highlight="abonnement en un coup d'œil"
-      />
-
-      <section className="animate-slide-up relative overflow-hidden rounded-3xl border border-border">
-        <div className="relative flex flex-col gap-6 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-2">
+    <div className="space-y-6">
+      <Card className="overflow-hidden border-primary p-0 gap-0">
+        <div className="grid gap-px md:grid-cols-[1.4fr_1fr]">
+          <div className="p-6 sm:p-8">
+            <div className="flex flex-wrap items-center gap-2">
               <Badge
-                className={cn("gap-1.5 border", STATUS_BG[subscription.status])}
+                variant="outline"
+                className={cn("gap-1.5", STATUS_BG[subscription.status])}
               >
-                <span className="size-1.5 rounded-full bg-current" />
+                <span
+                  className="size-1.5 rounded-full"
+                  aria-hidden="true"
+                />
                 {STATUS_LABELS[subscription.status] ?? subscription.status}
               </Badge>
-              <span className="text-xs font-medium text-muted-foreground">
+              <span className="text-xs text-muted-foreground">
                 Depuis le {formatDate(subscription.startDate)}
               </span>
             </div>
 
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">
-                Votre plan
-              </p>
-              <div className="mt-1 flex items-end gap-3">
-                <h1 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
-                  {plan.name}
-                </h1>
-                <span className="mb-1.5 text-lg font-semibold text-muted-foreground">
-                  {formatPrice(plan.price, plan.currency)}
-                  <span className="text-sm font-normal">
-                    /{plan.billingInterval === "annually" ? "an" : "mois"}
-                  </span>
+            <p className="mt-6 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+              Votre plan
+            </p>
+            <div className="mt-1 flex flex-wrap items-baseline gap-3">
+              <span className="font-display text-4xl font-bold tracking-tight text-foreground">
+                {plan.name}
+              </span>
+              <span className="font-display text-xl font-semibold text-primary">
+                {formatPrice(plan.price, plan.currency)}
+                <span className="text-sm font-normal text-muted-foreground">
+                  /{plan.billingInterval === "annually" ? "an" : "mois"}
                 </span>
-              </div>
-              <p className="mt-2 max-w-md text-sm text-muted-foreground">
-                {plan.description}
-              </p>
+              </span>
             </div>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {plan.description}
+            </p>
           </div>
 
-          <div className="flex shrink-0 flex-col gap-3 rounded-2xl border border-border bg-card/80 p-4 backdrop-blur-sm lg:w-64">
-            <div className="flex items-center gap-2 text-sm font-medium">
-              <CalendarClock className="size-4 text-primary" />
+          <div className="bg-card p-6 sm:p-8">
+            <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+              <CalendarClock
+                className="size-4 text-primary"
+                aria-hidden="true"
+              />
               Prochain renouvellement
             </div>
-            <p className="font-display text-lg font-bold">
+            <p className="mt-2 font-display text-xl font-semibold text-foreground">
               {formatDate(periodEnd)}
             </p>
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <div className="mt-5">
+              <div className="mb-1.5 flex items-center justify-between text-xs text-muted-foreground">
                 <span>Cycle en cours</span>
-                <span
-                  className={cn(
-                    "font-medium",
-                    remainingDays <= 3 ? "text-warning" : ""
-                  )}
-                >
+                <span className="font-medium text-foreground">
                   {remainingDays} j restants
                 </span>
               </div>
-              <div className="h-1.5 overflow-hidden rounded-full bg-secondary">
+              <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
                 <div
-                  className="h-full rounded-full bg-primary transition-all duration-700"
+                  className="h-full rounded-full bg-primary transition-all"
                   style={{ width: `${cycleProgress}%` }}
                 />
               </div>
             </div>
           </div>
         </div>
-      </section>
+      </Card>
 
-      <section className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-3">
         <UsageGauge
-          icon={FileStack}
-          label="Images analysées"
+          icon={ImageIcon}
+          label="Analyses d'images"
           used={imagesUsed}
           max={imagesMax}
-          unit="images analysées"
-          delay={0.1}
+          unit="analyses"
         />
         {videosMax > 0 ? (
           <UsageGauge
             icon={Video}
-            label="Vidéos analysées"
+            label="Analyses vidéo"
             used={videosUsed}
             max={videosMax}
-            unit="vidéos analysées"
-            delay={0.15}
+            unit="vidéos"
           />
         ) : (
-          <QuotaCard
-            icon={Video}
-            label="Vidéos"
-            value="Non incluses"
-            delay={0.15}
-          />
+          <QuotaCard icon={Video} label="Analyses vidéo" value="Non incluses" />
         )}
         <QuotaCard
           icon={HardDrive}
           label="Rétention historique"
           value={formatRetention(quota.historyRetention)}
-          delay={0.2}
         />
-      </section>
+      </div>
 
-      <section className="mt-5 grid gap-4 lg:grid-cols-5">
-        <Card
-          className={cn(
-            "animate-slide-up overflow-hidden border border-border p-0 ring-0",
-            hasPortal ? "lg:col-span-3" : "lg:col-span-5"
-          )}
-        >
-          <div className="border-b border-border px-6 py-4">
-            <h2 className="font-display text-base font-bold">
-              Détails du plan
-            </h2>
-            <p className="text-xs text-muted-foreground">
-              Limites et capacités incluses
-            </p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card className="p-6">
+          <h2 className="font-display text-lg font-semibold text-foreground">
+            Détails du plan
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Limites et capacités incluses
+          </p>
+          <div className="mt-4 divide-y">
             <DetailRow
-              icon={HardDrive}
-              label="Taille max image"
+              icon={FileStack}
+              label="Analyses par mois"
+              value={formatCount(imagesMax)}
+            />
+            <DetailRow
+              icon={ImageIcon}
+              label="Taille max. image"
               value={formatBytes(quota.maxFileSizeImage)}
             />
             {quota.maxFileSizeVideo > 0 && (
               <DetailRow
                 icon={Video}
-                label="Taille max vidéo"
+                label="Taille max. vidéo"
                 value={formatBytes(quota.maxFileSizeVideo)}
               />
             )}
@@ -261,7 +302,6 @@ export function SubscriptionPage({
               icon={TrendingUp}
               label="Pipeline"
               value={quota.fullPipeline ? "Complet" : "Basique"}
-              valueClass={quota.fullPipeline ? "text-success" : ""}
             />
             <DetailRow
               icon={Sparkles}
@@ -274,43 +314,69 @@ export function SubscriptionPage({
                     : "4+"
               }
             />
+            <DetailRow
+              icon={Timer}
+              label="Rétention des résultats"
+              value={formatRetention(quota.historyRetention)}
+            />
           </div>
         </Card>
 
-        {hasPortal && (
-          <Card className="animate-slide-up flex flex-col justify-between overflow-hidden border border-border p-0 ring-0 lg:col-span-2">
-            <div className="relative flex flex-col gap-3 p-6">
-              <div className="pointer-events-none absolute top-0 right-0 size-40 rounded-bl-full bg-primary/5" />
-              <div className="relative flex size-11 items-center justify-center rounded-xl bg-[#635bff]/10 text-[#635bff]">
-                <CreditCard className="size-5" />
-              </div>
-              <div>
-                <h2 className="font-display text-base font-bold">
-                  Portail client Stripe
-                </h2>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Gérez votre moyen de paiement, téléchargez vos factures,
-                  modifiez ou annulez votre abonnement.
-                </p>
-              </div>
+        <Card className="flex flex-col justify-between p-6">
+          <div className="flex items-start gap-4">
+            <div className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <CreditCard className="size-5" aria-hidden="true" />
             </div>
-            <div className="border-t border-border p-4">
+            <div>
+              <h2 className="font-display text-lg font-semibold text-foreground">
+                Facturation
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Gérez votre moyen de paiement, téléchargez vos factures,
+                modifiez ou annulez votre abonnement.
+              </p>
+            </div>
+          </div>
+          <div className="mt-6 space-y-3">
+            {hasPortal ? (
               <Button
-                onClick={handleOpenPortal}
-                disabled={portalLoading}
                 className="w-full"
+                onClick={onOpenPortal}
+                disabled={portalLoading}
               >
                 {portalLoading ? (
-                  <Loader2 className="size-4 animate-spin" />
+                  <Loader2 className="size-4 animate-spin" aria-hidden="true" />
                 ) : (
-                  <ExternalLink className="size-4" />
+                  <ExternalLink className="size-4" aria-hidden="true" />
                 )}
-                Ouvrir le portail Stripe
+                Ouvrir le portail de facturation
               </Button>
-            </div>
-          </Card>
-        )}
-      </section>
+            ) : (
+              <Button className="w-full" onClick={onGoPricing}>
+                <ArrowUpRight className="size-4" aria-hidden="true" />
+                Choisir un plan payant
+              </Button>
+            )}
+            <p className="text-center text-xs text-muted-foreground">
+              Paiement sécurisé — vous pouvez annuler à tout moment.
+            </p>
+          </div>
+        </Card>
+      </div>
+
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <Button
+          variant="outline"
+          className="sm:w-auto"
+          onClick={onGoPricing}
+        >
+          <ArrowUpRight className="size-4" aria-hidden="true" />
+          Changer de plan
+        </Button>
+        <Button variant="ghost" className="sm:w-auto" onClick={onGoDetect}>
+          Retour au détecteur
+        </Button>
+      </div>
     </div>
   )
 }
@@ -321,14 +387,12 @@ function UsageGauge({
   used,
   max,
   unit,
-  delay,
 }: {
-  icon: React.ComponentType<{ className?: string }>
+  icon: ComponentType<{ className?: string }>
   label: string
   used: number
   max: number
   unit: string
-  delay: number
 }) {
   const pct = max > 0 ? Math.min(100, (used / max) * 100) : 0
   const isWarning = pct >= 80
@@ -336,67 +400,67 @@ function UsageGauge({
   const radius = 42
   const circumference = 2 * Math.PI * radius
   const offset = circumference - (pct / 100) * circumference
-  const strokeColor = isCritical
-    ? "var(--destructive)"
-    : isWarning
-      ? "#f59e0b"
-      : "var(--primary)"
 
   return (
-    <Card
-      className="animate-slide-up flex flex-row items-center gap-4 rounded-2xl border border-border p-5 ring-0"
-      style={{ animationDelay: `${delay}s` }}
-    >
-      <div className="relative size-24 shrink-0">
-        <svg className="size-full -rotate-90" viewBox="0 0 100 100">
+    <Card className="flex flex-col items-center gap-4 p-6 text-center">
+      <div className="relative size-28">
+        <svg viewBox="0 0 100 100" className="size-full -rotate-90">
           <circle
             cx="50"
             cy="50"
             r={radius}
             fill="none"
-            stroke="var(--border)"
             strokeWidth="8"
+            className="stroke-muted"
           />
           <circle
             cx="50"
             cy="50"
             r={radius}
             fill="none"
-            stroke={strokeColor}
             strokeWidth="8"
             strokeLinecap="round"
             strokeDasharray={circumference}
             strokeDashoffset={offset}
-            className="transition-all duration-700 ease-out"
+            className={cn(
+              "transition-[stroke-dashoffset] duration-700",
+              isCritical
+                ? "stroke-destructive"
+                : isWarning
+                  ? "stroke-amber-500"
+                  : "stroke-primary"
+            )}
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="font-display text-lg font-bold tabular-nums">
+          <span className="font-display text-xl font-bold text-foreground">
             {Math.round(pct)}%
           </span>
         </div>
       </div>
 
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Icon className="size-3.5" />
+      <div>
+        <div className="flex items-center justify-center gap-1.5 text-sm font-medium text-foreground">
+          <Icon className="size-4 text-muted-foreground" aria-hidden="true" />
           {label}
         </div>
-        <p className="font-display mt-1 text-xl font-bold tabular-nums">
-          {formatCount(used)}
-          <span className="text-sm font-normal text-muted-foreground">
+        <p className="mt-1 text-sm text-foreground">
+          <span className="font-display font-semibold">
+            {formatCount(used)}
+          </span>
+          <span className="text-muted-foreground">
             {" "}
             / {formatCount(max)} {unit}
           </span>
         </p>
         <p
           className={cn(
-            "mt-0.5 text-xs font-medium",
+            "mt-1 text-xs",
             isCritical
               ? "text-destructive"
               : isWarning
                 ? "text-amber-600"
-                : "text-emerald-600"
+                : "text-muted-foreground"
           )}
         >
           {isCritical
@@ -414,24 +478,21 @@ function QuotaCard({
   icon: Icon,
   label,
   value,
-  delay,
 }: {
-  icon: React.ComponentType<{ className?: string }>
+  icon: ComponentType<{ className?: string }>
   label: string
   value: string
-  delay: number
 }) {
   return (
-    <Card
-      className="animate-slide-up flex flex-row items-center gap-4 rounded-2xl border border-border p-5 ring-0"
-      style={{ animationDelay: `${delay}s` }}
-    >
-      <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-muted text-muted-foreground">
-        <Icon className="size-5" />
+    <Card className="flex flex-col items-center justify-center gap-3 p-6 text-center">
+      <div className="flex size-11 items-center justify-center rounded-lg bg-accent text-accent-foreground">
+        <Icon className="size-5" aria-hidden="true" />
       </div>
-      <div className="min-w-0">
-        <p className="text-sm text-muted-foreground">{label}</p>
-        <p className="font-display mt-0.5 text-lg font-bold">{value}</p>
+      <div>
+        <p className="text-sm font-medium text-foreground">{label}</p>
+        <p className="mt-1 font-display text-xl font-bold text-foreground">
+          {value}
+        </p>
       </div>
     </Card>
   )
@@ -441,20 +502,18 @@ function DetailRow({
   icon: Icon,
   label,
   value,
-  valueClass,
 }: {
-  icon: React.ComponentType<{ className?: string }>
+  icon: ComponentType<{ className?: string }>
   label: string
   value: string
-  valueClass?: string
 }) {
   return (
-    <div className="flex items-center justify-between border-b border-border px-6 py-3.5 last:border-b-0">
-      <span className="flex items-center gap-2.5 text-sm text-muted-foreground">
-        <Icon className="size-4 text-muted-foreground/70" />
+    <div className="flex items-center justify-between py-3 text-sm">
+      <span className="flex items-center gap-2 text-muted-foreground">
+        <Icon className="size-4" aria-hidden="true" />
         {label}
       </span>
-      <span className={cn("text-sm font-semibold", valueClass)}>{value}</span>
+      <span className="font-medium text-foreground">{value}</span>
     </div>
   )
 }
