@@ -1,10 +1,11 @@
 "use client"
 
 import { createContext, useContext } from "react"
-import { Scan, ScanState } from "./types"
+import { Scan, ScanFilters, ScanState } from "./types"
 
 export interface ScanContextType extends ScanState {
   fetchScans: (page?: number) => Promise<void>
+  setFilters: (filters: ScanFilters) => Promise<void>
   fetchScan: (id: string) => Promise<Scan>
   uploadFile: (file: File) => Promise<void>
 }

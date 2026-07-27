@@ -10,12 +10,13 @@ import {
 } from "./api"
 import { ScanContext } from "./context"
 import { scanReducer } from "./reducer"
-import { Scan, ScanState } from "./types"
+import { Scan, ScanFilters, ScanState } from "./types"
 
 const SCANS_PAGE_LIMIT = 10
 
 const initialState: ScanState = {
   scans: initPaginate<Scan>(),
+  filters: {},
   isScansLoading: false,
   scansError: null,
 }
@@ -23,6 +24,7 @@ const initialState: ScanState = {
 export function ScanProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(scanReducer, initialState)
   const pageRef = useRef(1)
+  const filtersRef = useRef<ScanFilters>({})
 
   const fetchScans = useCallback(async (page = pageRef.current) => {
     pageRef.current = page
@@ -34,6 +36,7 @@ export function ScanProvider({ children }: { children: React.ReactNode }) {
         limit: SCANS_PAGE_LIMIT,
         sortBy: "created_at",
         orderBy: "desc",
+        ...filtersRef.current,
       })
       dispatch({ type: "GET_ANALYSES", payload: scans })
     } catch {
@@ -45,6 +48,15 @@ export function ScanProvider({ children }: { children: React.ReactNode }) {
       dispatch({ type: "GET_ANALYSES_LOADING", payload: false })
     }
   }, [])
+
+  const setFilters = useCallback(
+    async (filters: ScanFilters) => {
+      filtersRef.current = filters
+      dispatch({ type: "SET_FILTERS", payload: filters })
+      await fetchScans(1)
+    },
+    [fetchScans]
+  )
 
   const fetchScan = useCallback(async (id: string) => {
     return getScan(id)
@@ -81,6 +93,7 @@ export function ScanProvider({ children }: { children: React.ReactNode }) {
       value={{
         ...state,
         fetchScans,
+        setFilters,
         fetchScan,
         uploadFile,
       }}

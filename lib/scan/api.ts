@@ -26,6 +26,9 @@ export const getScans = async (
 
   if (query.search) params.set("search", query.search)
   if (query.tags) params.set("tags", query.tags)
+  if (query.verdict) params.set("verdict", query.verdict)
+  if (query.confidence) params.set("confidence", query.confidence)
+  if (query.status) params.set("status", query.status)
 
   const response = await fetch(`/api/scans?${params}`, {
     method: "GET",

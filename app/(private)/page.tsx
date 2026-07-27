@@ -3,10 +3,12 @@
 import { ScanItem } from "@/components/scan-item"
 import { EmptyComponent } from "@/components/empty"
 import { Header } from "@/components/header"
+import { ScansFilters } from "@/components/scans-filters"
 import { ScansPagination } from "@/components/scans-pagination"
 import { StatCard } from "@/components/statistic-card"
 import { UploadDropzone } from "@/components/upload-dropzone"
 import { useScan } from "@/lib/scan/context"
+import type { ScanFilters as ScanFiltersState } from "@/lib/scan/types"
 import {
   createUploadFiles,
   revokeUploadFilePreviews,
@@ -17,7 +19,8 @@ import { Bot, ImageIcon, Images, ShieldCheck, TrendingUp } from "lucide-react"
 import { useCallback, useEffect, useRef, useState } from "react"
 
 export default function Page() {
-  const { scans, isScansLoading, fetchScans, uploadFile } = useScan()
+  const { scans, filters, isScansLoading, fetchScans, setFilters, uploadFile } =
+    useScan()
   const { statistics } = useStatistics()
   const [pendingFiles, setPendingFiles] = useState<UploadFile[]>([])
   const [isSending, setIsSending] = useState(false)
@@ -66,6 +69,17 @@ export default function Page() {
     [fetchScans]
   )
 
+  const handleFiltersChange = useCallback(
+    (next: ScanFiltersState) => {
+      void setFilters(next)
+    },
+    [setFilters]
+  )
+
+  const hasFilters = Boolean(
+    filters.verdict || filters.confidence || filters.status
+  )
+
   return (
     <div className="container mx-auto flex max-w-6xl flex-col gap-8 p-4">
       <Header />
@@ -77,7 +91,7 @@ export default function Page() {
         isSending={isSending}
       />
 
-      <section className="animate-fade-in grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <section className="animate-fade-in grid grid-cols-2 gap-3 sm:grid-cols-4 mb-4">
         <StatCard
           icon={Images}
           label="Scans"
@@ -105,6 +119,12 @@ export default function Page() {
       </section>
 
       <section className="flex flex-col gap-4">
+        <ScansFilters
+          filters={filters}
+          onChange={handleFiltersChange}
+          disabled={isScansLoading}
+        />
+
         {scans.members.length > 0 ? (
           <>
             <ul className="flex flex-col gap-3">
@@ -123,8 +143,12 @@ export default function Page() {
           </>
         ) : (
           <EmptyComponent
-            title="Aucune analyse"
-            description="Dépose un fichier pour lancer une première analyse."
+            title={hasFilters ? "Aucun résultat" : "Aucune analyse"}
+            description={
+              hasFilters
+                ? "Aucun scan ne correspond à ces filtres. Essayez d’élargir votre sélection."
+                : "Dépose un fichier pour lancer une première analyse."
+            }
             icon={<ImageIcon className="size-5 text-muted-foreground" />}
           />
         )}

@@ -4,23 +4,35 @@ import { NextRequest, NextResponse } from "next/server"
 
 const BACKEND_API_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL
 
+const FORWARD_PARAMS = [
+  "page",
+  "limit",
+  "sortBy",
+  "orderBy",
+  "search",
+  "tags",
+  "verdict",
+  "confidence",
+  "status",
+] as const
+
 export async function GET(request: NextRequest) {
   try {
     const auth = await requireAuth()
     if ("error" in auth) return auth.error
 
     const { searchParams } = request.nextUrl
-    const page = searchParams.get("page") ?? "1"
-    const limit = searchParams.get("limit") ?? "10"
-    const sortBy = searchParams.get("sortBy") ?? "created_at"
-    const orderBy = searchParams.get("orderBy") ?? "desc"
+    const query = new URLSearchParams()
 
-    const query = new URLSearchParams({
-      page,
-      limit,
-      sortBy,
-      orderBy,
-    })
+    for (const key of FORWARD_PARAMS) {
+      const value = searchParams.get(key)
+      if (value) query.set(key, value)
+    }
+
+    if (!query.has("page")) query.set("page", "1")
+    if (!query.has("limit")) query.set("limit", "10")
+    if (!query.has("sortBy")) query.set("sortBy", "created_at")
+    if (!query.has("orderBy")) query.set("orderBy", "desc")
 
     const response = await fetch(`${BACKEND_API_URL}/api/scans?${query}`, {
       method: "GET",

@@ -2,7 +2,7 @@ import { Paginate } from "../paginate"
 
 export type ScanVerdict = "likely_ai" | "likely_real" | "uncertain"
 export type ScanConfidence = "low" | "medium" | "high" | "unknown"
-export type ScanStatus = "pending" | "processing" | "analyzed" | "failed"
+export type ScanStatus = "pending" | "processing" | "completed" | "failed"
 
 export interface Insight {
   noise: number
@@ -59,8 +59,15 @@ export interface GeneratePresignedUploadUrlDetailResponse {
   uploadUrl: string
 }
 
+export interface ScanFilters {
+  verdict?: ScanVerdict
+  confidence?: ScanConfidence
+  status?: ScanStatus
+}
+
 export interface ScanState {
   scans: Paginate<Scan>
+  filters: ScanFilters
   isScansLoading: boolean
   scansError: string | null
 }
@@ -69,3 +76,4 @@ export type ScanAction =
   | { type: "GET_ANALYSES"; payload: Paginate<Scan> }
   | { type: "GET_ANALYSES_ERROR"; payload: string }
   | { type: "GET_ANALYSES_LOADING"; payload: boolean }
+  | { type: "SET_FILTERS"; payload: ScanFilters }

@@ -61,7 +61,7 @@ export function ScanItem({ item }: ScanItemProps) {
     primaryMedia?.filename || primaryMedia?.key || displayName,
     primaryMedia?.contentType
   )
-  const isComplete = item.status === "analyzed" && item.verdict
+  const isComplete = item.status === "completed" && item.verdict
   const isAnalyzing = item.status === "pending" || item.status === "processing"
   const isFailed = item.status === "failed"
   const progress = getScanProgress(item.status)

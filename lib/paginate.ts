@@ -20,6 +20,9 @@ export interface PaginateQuery {
   orderBy?: string
   search?: string
   tags?: string
+  verdict?: string
+  confidence?: string
+  status?: string
 }
 
 export const initPaginate = <TData>(): Paginate<TData> => {
