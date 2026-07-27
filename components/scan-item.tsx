@@ -136,15 +136,7 @@ export function ScanItem({ item }: ScanItemProps) {
                 <Progress value={progress} className="h-1.5 w-24" />
               </div>
             ) : isFailed ? (
-              <div className="min-w-0 space-y-0.5">
-                {item.message ? (
-                  <p className="truncate text-sm text-destructive/70">
-                    {item.message}
-                  </p>
-                ) : (
-                  <p className="text-sm text-destructive">Scan failed</p>
-                )}
-              </div>
+              <ErrorBadge message={item.message} />
             ) : (
               <span className="text-sm text-muted-foreground">
                 Processing...
@@ -155,7 +147,7 @@ export function ScanItem({ item }: ScanItemProps) {
 
         <div className="hidden shrink-0 items-center gap-2 sm:flex">
           {isComplete ? (
-            <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-[0.625rem] font-medium text-primary">
+            <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs text-primary">
               <Check className="size-3" />
               Completed
             </span>
@@ -167,7 +159,7 @@ export function ScanItem({ item }: ScanItemProps) {
               <Loader2 className="size-5 animate-spin text-primary" />
             </span>
           ) : isFailed ? (
-            <span className="inline-flex items-center gap-1 rounded-full bg-destructive/10 px-2.5 py-1 text-[0.625rem] font-medium text-destructive">
+            <span className="inline-flex items-center gap-1 rounded-full bg-destructive/10 px-2.5 py-1 text-xs text-destructive">
               <CircleAlert className="size-3" />
               Failed
             </span>
@@ -186,9 +178,21 @@ export function ScanItem({ item }: ScanItemProps) {
 
 function SizeBadge({ size }: { size: number }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2 py-0.5 text-[0.625rem] font-semibold text-muted-foreground tabular-nums">
+    <span className="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2 py-0.5 text-xs text-muted-foreground tabular-nums">
       <HardDrive className="size-3" />
       {formatBytes(size)}
+    </span>
+  )
+}
+
+function ErrorBadge({ message }: { message?: string | null }) {
+  return (
+    <span
+      className="inline-flex max-w-full items-center gap-1 rounded-full border border-destructive/20 bg-destructive/10 px-2 py-0.5 text-xs text-destructive"
+      title={message ?? "Analyse échouée"}
+    >
+      <CircleAlert className="size-3 shrink-0" />
+      <span className="truncate">{message ?? "Analyse échouée"}</span>
     </span>
   )
 }
@@ -200,7 +204,7 @@ function VerdictBadge({ verdict }: { verdict: ScanVerdict }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[0.625rem] font-semibold",
+        "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs",
         cfg.bg,
         cfg.color,
         cfg.border
@@ -219,7 +223,7 @@ function ConfidenceBadge({ confidence }: { confidence: ScanConfidence }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[0.625rem] font-semibold",
+        "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs",
         cfg.bg,
         cfg.color,
         cfg.border
@@ -243,7 +247,7 @@ function ScorePill({
 
   return (
     <span
-      className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[0.625rem] font-medium tabular-nums"
+      className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs tabular-nums"
       style={{
         backgroundColor: `color-mix(in oklch, var(${colorVar}) 10%, transparent)`,
         color: `var(${colorVar})`,
