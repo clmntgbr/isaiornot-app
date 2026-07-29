@@ -187,10 +187,7 @@ function SubscriptionContent({
                 variant="outline"
                 className={cn("gap-1.5", STATUS_BG[subscription.status])}
               >
-                <span
-                  className="size-1.5 rounded-full"
-                  aria-hidden="true"
-                />
+                <span className="size-1.5 rounded-full bg-current" />
                 {STATUS_LABELS[subscription.status] ?? subscription.status}
               </Badge>
               <span className="text-xs text-muted-foreground">

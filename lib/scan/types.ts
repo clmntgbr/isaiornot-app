@@ -45,6 +45,7 @@ export interface Scan {
   filename?: string
   thumbnail?: string
   insight?: Insight
+  duration?: number
   medias: Media[]
   createdAt: string
   updatedAt: string
