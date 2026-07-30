@@ -46,6 +46,7 @@ export interface Scan {
   thumbnail?: string
   insight?: Insight
   duration?: number
+  retryCount?: number
   medias: Media[]
   createdAt: string
   updatedAt: string
