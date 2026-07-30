@@ -16,6 +16,7 @@ import { Scan, ScanConfidence, ScanVerdict } from "@/lib/scan/types"
 import { cn } from "@/lib/utils"
 import {
   Bot,
+  Calendar,
   Check,
   ChevronRight,
   CircleAlert,
@@ -128,6 +129,7 @@ export function ScanItem({ item }: ScanItemProps) {
 
           <div className="flex flex-wrap items-center gap-2">
             {size !== undefined && <SizeBadge size={size} />}
+            <CreatedAtBadge date={item.createdAt} />
             {isComplete &&
             cfg &&
             item.verdict &&
@@ -202,6 +204,27 @@ function SizeBadge({ size }: { size: number }) {
       {formatBytes(size)}
     </span>
   )
+}
+
+function CreatedAtBadge({ date }: { date: string }) {
+  return (
+    <span
+      className="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2 py-0.5 text-xs text-muted-foreground tabular-nums"
+      title="Date de création"
+    >
+      <Calendar className="size-3" />
+      {formatCreatedAt(date)}
+    </span>
+  )
+}
+
+function formatCreatedAt(value: string): string {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return "—"
+
+  const pad = (n: number) => String(n).padStart(2, "0")
+
+  return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
 }
 
 function DurationBadge({ duration }: { duration: number }) {
