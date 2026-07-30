@@ -27,6 +27,7 @@ import {
   SignalHigh,
   SignalLow,
   SignalMedium,
+  Timer,
   User,
 } from "lucide-react"
 import { useState } from "react"
@@ -137,9 +138,17 @@ export function ScanItem({ item }: ScanItemProps) {
                 {item.confidence && (
                   <ConfidenceBadge confidence={item.confidence} />
                 )}
+                {item.duration !== undefined && (
+                  <DurationBadge duration={item.duration} />
+                )}
               </>
             ) : isFailed ? (
-              <ErrorBadge message={item.message} />
+              <>
+                <ErrorBadge message={item.message} />
+                {item.duration !== undefined && (
+                  <DurationBadge duration={item.duration} />
+                )}
+              </>
             ) : (
               <AnalyzingBadge />
             )}
@@ -193,6 +202,51 @@ function SizeBadge({ size }: { size: number }) {
       {formatBytes(size)}
     </span>
   )
+}
+
+function DurationBadge({ duration }: { duration: number }) {
+  return (
+    <span
+      className="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2 py-0.5 text-xs text-muted-foreground tabular-nums"
+      title="Durée d'analyse"
+    >
+      <Timer className="size-3" />
+      {formatScanDuration(duration)}
+    </span>
+  )
+}
+
+/** `duration` is in milliseconds. */
+function formatScanDuration(ms: number): string {
+  if (!Number.isFinite(ms) || ms < 0) return "—"
+
+  if (ms < 1000) {
+    return `${Math.round(ms)}ms`
+  }
+
+  const totalSeconds = ms / 1000
+  if (totalSeconds < 60) {
+    return `${totalSeconds.toLocaleString("fr-FR", {
+      maximumFractionDigits: totalSeconds < 10 ? 1 : 0,
+      minimumFractionDigits: 0,
+    })}s`
+  }
+
+  const totalMinutes = Math.floor(totalSeconds / 60)
+  const seconds = Math.round(totalSeconds % 60)
+  if (totalMinutes < 60) {
+    return seconds > 0 ? `${totalMinutes}m ${seconds}s` : `${totalMinutes}m`
+  }
+
+  const hours = Math.floor(totalMinutes / 60)
+  const minutes = totalMinutes % 60
+  if (hours < 24) {
+    return minutes > 0 ? `${hours}h ${minutes}min` : `${hours}h`
+  }
+
+  const days = Math.floor(hours / 24)
+  const remHours = hours % 24
+  return remHours > 0 ? `${days}j ${remHours}h` : `${days}j`
 }
 
 function ErrorBadge({ message }: { message?: string | null }) {
