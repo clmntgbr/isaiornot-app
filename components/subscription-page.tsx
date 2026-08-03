@@ -1,8 +1,8 @@
 "use client"
 
+import { PageHero } from "@/components/page-hero"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
 import {
   formatBytes,
   formatCount,
@@ -14,18 +14,18 @@ import { useSubscription } from "@/lib/subscription/context"
 import type { Subscription } from "@/lib/subscription/types"
 import { cn } from "@/lib/utils"
 import {
+  ArrowLeft,
   ArrowUpRight,
   CalendarClock,
+  Check,
   CreditCard,
   ExternalLink,
-  FileStack,
   HardDrive,
   Image as ImageIcon,
   Loader2,
   Sparkles,
-  Timer,
-  TrendingUp,
   Video,
+  Zap,
 } from "lucide-react"
 import { useEffect, useState, type ComponentType } from "react"
 import { toast } from "sonner"
@@ -85,15 +85,15 @@ export function SubscriptionPage({
   }
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10 sm:py-14">
-      <div className="mb-8">
-        <h1 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-          My subscription
-        </h1>
-        <p className="mt-2 text-muted-foreground">
-          Your plan, usage, and billing.
-        </p>
-      </div>
+    <div className="container mx-auto flex max-w-6xl flex-col gap-8 p-4 pb-20">
+      <PageHero
+        badge="Billing & usage"
+        icon={Zap}
+        title="Your"
+        highlight="subscription"
+        highlightInline
+        subtitle="Track your plan, quota, and billing in one place."
+      />
 
       {isLoading && !subscription ? (
         <LoadingState />
@@ -114,16 +114,16 @@ export function SubscriptionPage({
 
 function LoadingState() {
   return (
-    <div className="space-y-6" aria-busy="true" aria-live="polite">
-      <div className="h-56 w-full animate-pulse rounded-xl bg-muted" />
+    <div className="space-y-4" aria-busy="true" aria-live="polite">
+      <div className="h-56 w-full animate-pulse rounded-2xl bg-muted" />
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className="h-40 animate-pulse rounded-xl bg-muted" />
-        <div className="h-40 animate-pulse rounded-xl bg-muted" />
-        <div className="h-40 animate-pulse rounded-xl bg-muted" />
+        <div className="h-32 animate-pulse rounded-2xl bg-muted" />
+        <div className="h-32 animate-pulse rounded-2xl bg-muted" />
+        <div className="h-32 animate-pulse rounded-2xl bg-muted" />
       </div>
       <div className="grid gap-4 lg:grid-cols-2">
-        <div className="h-64 animate-pulse rounded-xl bg-muted" />
-        <div className="h-64 animate-pulse rounded-xl bg-muted" />
+        <div className="h-64 animate-pulse rounded-2xl bg-muted" />
+        <div className="h-64 animate-pulse rounded-2xl bg-muted" />
       </div>
       <p className="sr-only">Loading your subscription…</p>
     </div>
@@ -132,20 +132,36 @@ function LoadingState() {
 
 function EmptyState({ onGoPricing }: { onGoPricing: () => void }) {
   return (
-    <Card className="flex flex-col items-center gap-4 p-12 text-center">
-      <div className="flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
-        <CreditCard className="size-6" aria-hidden="true" />
+    <div
+      className="animate-slide-up relative overflow-hidden rounded-2xl border border-dashed border-border bg-card px-6 py-16 text-center"
+      style={{ animationDelay: "0.1s" }}
+    >
+      <div className="bg-grid mask-fade-b pointer-events-none absolute inset-0 opacity-30" />
+      <div
+        className="pointer-events-none absolute top-0 left-1/2 size-72 -translate-x-1/2 rounded-full opacity-20 blur-3xl"
+        style={{
+          background:
+            "radial-gradient(circle, var(--primary), transparent 70%)",
+        }}
+      />
+      <div className="relative flex flex-col items-center gap-4">
+        <div className="flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+          <CreditCard className="size-6" aria-hidden="true" />
+        </div>
+        <div className="space-y-2">
+          <h2 className="font-display text-xl font-bold text-foreground">
+            No active subscription
+          </h2>
+          <p className="mx-auto max-w-sm text-sm text-muted-foreground">
+            Choose a plan to unlock multi-model detection and higher quotas.
+          </p>
+        </div>
+        <Button onClick={onGoPricing} className="mt-1">
+          <Sparkles className="size-4" aria-hidden="true" />
+          View plans
+        </Button>
       </div>
-      <div>
-        <h2 className="font-display text-lg font-semibold text-foreground">
-          No active subscription
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Choose a plan to unlock analyses.
-        </p>
-      </div>
-      <Button onClick={onGoPricing}>View plans</Button>
-    </Card>
+    </div>
   )
 }
 
@@ -177,12 +193,32 @@ function SubscriptionContent({
   const videosMax = usage?.videosMax ?? quota.maxVideosPerMonth
   const hasPortal = Boolean(subscription.stripeCustomerId)
 
+  const includedFeatures = [
+    `${formatCount(imagesMax)} image analyses / month`,
+    videosMax > 0
+      ? `${formatCount(videosMax)} video analyses / month`
+      : "Videos not included",
+    `Images up to ${formatBytes(quota.maxFileSizeImage)}`,
+    ...(quota.maxFileSizeVideo > 0
+      ? [`Videos up to ${formatBytes(quota.maxFileSizeVideo)}`]
+      : []),
+    quota.fullPipeline ? "Full detection pipeline" : "Basic pipeline",
+    `${
+      plan.slug === "free" ? "1" : plan.slug === "starter" ? "2" : "4+"
+    } detection model${plan.slug === "free" ? "" : "s"}`,
+    `History retained for ${formatRetention(quota.historyRetention)}`,
+  ]
+
   return (
-    <div className="space-y-6">
-      <Card className="overflow-hidden border-primary p-0 gap-0">
-        <div className="grid gap-px md:grid-cols-[1.4fr_1fr]">
-          <div className="p-6 sm:p-8">
-            <div className="flex flex-wrap items-center gap-2">
+    <div className="flex flex-col gap-4">
+      {/* Plan banner — matches reference layout */}
+      <section
+        className="animate-slide-up relative overflow-hidden rounded-2xl border border-primary/20 bg-linear-to-br from-primary/10 via-sky-500/5 to-background p-5 sm:p-6"
+        style={{ animationDelay: "0.08s" }}
+      >
+        <div className="grid items-stretch gap-5 lg:grid-cols-[1.35fr_1fr]">
+          <div className="flex flex-col justify-center gap-5">
+            <div className="flex flex-wrap items-center gap-2.5">
               <Badge
                 variant="outline"
                 className={cn("gap-1.5", STATUS_BG[subscription.status])}
@@ -190,49 +226,55 @@ function SubscriptionContent({
                 <span className="size-1.5 rounded-full bg-current" />
                 {STATUS_LABELS[subscription.status] ?? subscription.status}
               </Badge>
-              <span className="text-xs text-muted-foreground">
+              <span className="text-sm text-muted-foreground">
                 Since {formatDate(subscription.startDate)}
               </span>
             </div>
 
-            <p className="mt-6 text-sm text-muted-foreground">
-              Your plan
-            </p>
-            <div className="mt-1 flex flex-wrap items-baseline gap-3">
-              <span className="font-display text-6xl font-extrabold tracking-tight text-foreground">
-                {plan.name}
-              </span>
-              <span className="font-display text-xl font-semibold text-primary">
-                {formatPrice(plan.price, plan.currency)}
-                <span className="text-sm font-normal text-muted-foreground">
-                  /{plan.billingInterval === "annually" ? "year" : "month"}
-                </span>
-              </span>
+            <div>
+              <p className="text-sm text-muted-foreground">Your plan</p>
+              <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <h2 className="font-display text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl">
+                  {plan.name}
+                </h2>
+                <p className="text-lg text-muted-foreground sm:text-xl">
+                  {plan.price === 0
+                    ? "Free"
+                    : formatPrice(plan.price, plan.currency)}
+                  {plan.price > 0 && (
+                    <span>
+                      /{plan.billingInterval === "annually" ? "year" : "month"}
+                    </span>
+                  )}
+                </p>
+              </div>
+              {plan.description ? (
+                <p className="mt-2 max-w-md text-sm text-muted-foreground">
+                  {plan.description}
+                </p>
+              ) : null}
             </div>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {plan.description}
-            </p>
           </div>
 
-          <div className="bg-card p-6 sm:p-8">
-            <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+          <div className="rounded-2xl border border-border/60 bg-card p-5 shadow-sm sm:p-6">
+            <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
               <CalendarClock
                 className="size-4 text-primary"
                 aria-hidden="true"
               />
               Next renewal
             </div>
-            <p className="mt-2 font-display text-xl font-semibold text-foreground">
+            <p className="mt-3 font-display text-2xl font-bold tracking-tight text-foreground">
               {formatDate(periodEnd)}
             </p>
             <div className="mt-5">
               <div className="mb-1.5 flex items-center justify-between text-xs text-muted-foreground">
                 <span>Current cycle</span>
                 <span className="font-medium text-foreground">
-                  {remainingDays} days left
+                  {remainingDays}d left
                 </span>
               </div>
-              <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
                 <div
                   className="h-full rounded-full bg-primary transition-all"
                   style={{ width: `${cycleProgress}%` }}
@@ -241,141 +283,152 @@ function SubscriptionContent({
             </div>
           </div>
         </div>
-      </Card>
+      </section>
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <UsageGauge
+      {/* Usage gauges row */}
+      <section
+        className="animate-slide-up grid gap-4 sm:grid-cols-3"
+        style={{ animationDelay: "0.14s" }}
+      >
+        <UsageGaugeCard
           icon={ImageIcon}
-          label="Image analyses"
+          label="Images analyzed"
           used={imagesUsed}
           max={imagesMax}
-          unit="analyses"
+          unit="images"
         />
         {videosMax > 0 ? (
-          <UsageGauge
+          <UsageGaugeCard
             icon={Video}
-            label="Video analyses"
+            label="Videos analyzed"
             used={videosUsed}
             max={videosMax}
             unit="videos"
           />
         ) : (
-          <QuotaCard icon={Video} label="Video analyses" value="Not included" />
-        )}
-        <QuotaCard
-          icon={HardDrive}
-          label="History retention"
-          value={formatRetention(quota.historyRetention)}
-        />
-      </div>
-
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card className="p-6">
-          <h2 className="font-display text-lg font-semibold text-foreground">
-            Plan details
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Included limits and capabilities
-          </p>
-          <div className="mt-4 divide-y">
-            <DetailRow
-              icon={FileStack}
-              label="Analyses per month"
-              value={formatCount(imagesMax)}
-            />
-            <DetailRow
-              icon={ImageIcon}
-              label="Max image size"
-              value={formatBytes(quota.maxFileSizeImage)}
-            />
-            {quota.maxFileSizeVideo > 0 && (
-              <DetailRow
-                icon={Video}
-                label="Max video size"
-                value={formatBytes(quota.maxFileSizeVideo)}
-              />
-            )}
-            <DetailRow
-              icon={TrendingUp}
-              label="Pipeline"
-              value={quota.fullPipeline ? "Full" : "Basic (metadata & heuristics)"}
-            />
-            <DetailRow
-              icon={Sparkles}
-              label="Detection models"
-              value={
-                plan.slug === "free"
-                  ? "1"
-                  : plan.slug === "starter"
-                    ? "2"
-                    : "4+"
-              }
-            />
-            <DetailRow
-              icon={Timer}
-              label="Result retention"
-              value={formatRetention(quota.historyRetention)}
-            />
-          </div>
-        </Card>
-
-        <Card className="flex flex-col justify-between p-6">
-          <div className="flex items-start gap-4">
-            <div className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-              <CreditCard className="size-5" aria-hidden="true" />
+          <div className="flex items-center gap-4 rounded-2xl border border-border bg-card p-5">
+            <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-muted text-muted-foreground">
+              <Video className="size-5" aria-hidden="true" />
             </div>
-            <div>
-              <h2 className="font-display text-lg font-semibold text-foreground">
-                Billing
-              </h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Manage your payment method, download invoices, or change or
-                cancel your subscription.
+            <div className="min-w-0">
+              <p className="text-sm text-muted-foreground">Videos analyzed</p>
+              <p className="mt-1 font-display text-xl font-bold text-foreground">
+                Not included
               </p>
             </div>
           </div>
-          <div className="mt-6 space-y-3">
-            {hasPortal ? (
-              <Button
-                className="w-full"
-                onClick={onOpenPortal}
-                disabled={portalLoading}
-              >
-                {portalLoading ? (
-                  <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-                ) : (
-                  <ExternalLink className="size-4" aria-hidden="true" />
-                )}
-                Open billing portal
-              </Button>
-            ) : (
-              <Button className="w-full" onClick={onGoPricing}>
-                <ArrowUpRight className="size-4" aria-hidden="true" />
-                Choose a paid plan
-              </Button>
-            )}
-            <p className="text-center text-xs text-muted-foreground">
-              Secure payment — you can cancel anytime.
+        )}
+        <div className="flex items-center gap-4 rounded-2xl border border-border bg-card p-5">
+          <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-muted text-muted-foreground">
+            <HardDrive className="size-5" aria-hidden="true" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm text-muted-foreground">History retention</p>
+            <p className="mt-1 font-display text-xl font-bold text-foreground">
+              {formatRetention(quota.historyRetention)}
             </p>
           </div>
-        </Card>
-      </div>
+        </div>
+      </section>
 
-      <div className="flex flex-col gap-3 sm:flex-row">
-        <Button
-          variant="outline"
-          className="sm:w-auto"
-          onClick={onGoPricing}
-        >
-          <ArrowUpRight className="size-4" aria-hidden="true" />
-          Change plan
-        </Button>
-      </div>
+      <section
+        className="animate-slide-up grid gap-4 lg:grid-cols-2"
+        style={{ animationDelay: "0.2s" }}
+      >
+        <div className="rounded-2xl border border-border bg-card p-6">
+          <h3 className="font-display text-lg font-bold text-foreground">
+            What&apos;s included
+          </h3>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Everything in your {plan.name} plan
+          </p>
+          <ul className="mt-5 flex flex-col gap-3">
+            {includedFeatures.map((feature) => (
+              <li key={feature} className="flex items-start gap-2.5">
+                <span className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-primary/15">
+                  <Check className="size-3 text-primary" />
+                </span>
+                <span className="text-sm text-foreground">{feature}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-6">
+          <div
+            className="pointer-events-none absolute -right-10 -bottom-12 size-56 rounded-full opacity-20 blur-3xl"
+            style={{
+              background:
+                "radial-gradient(circle, var(--primary), transparent 70%)",
+            }}
+          />
+          <div className="relative flex h-full flex-col justify-between gap-8">
+            <div>
+              <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <CreditCard className="size-5" aria-hidden="true" />
+              </div>
+              <h3 className="mt-4 font-display text-lg font-bold text-foreground">
+                Billing
+              </h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Manage your payment method, download invoices, or cancel your
+                subscription anytime.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              {hasPortal ? (
+                <Button
+                  className="w-full"
+                  onClick={onOpenPortal}
+                  disabled={portalLoading}
+                >
+                  {portalLoading ? (
+                    <Loader2
+                      className="size-4 animate-spin"
+                      aria-hidden="true"
+                    />
+                  ) : (
+                    <ExternalLink className="size-4" aria-hidden="true" />
+                  )}
+                  Open billing portal
+                </Button>
+              ) : (
+                <Button className="w-full" onClick={onGoPricing}>
+                  <ArrowUpRight className="size-4" aria-hidden="true" />
+                  Choose a paid plan
+                </Button>
+              )}
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={onGoPricing}
+                >
+                  <ArrowUpRight className="size-4" aria-hidden="true" />
+                  Change plan
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="flex-1"
+                  onClick={onGoDetect}
+                >
+                  <ArrowLeft className="size-4" aria-hidden="true" />
+                  Detector
+                </Button>
+              </div>
+              <p className="text-center text-xs text-muted-foreground">
+                Secure payment — cancel anytime.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   )
 }
 
-function UsageGauge({
+function UsageGaugeCard({
   icon: Icon,
   label,
   used,
@@ -391,13 +444,14 @@ function UsageGauge({
   const pct = max > 0 ? Math.min(100, (used / max) * 100) : 0
   const isWarning = pct >= 80
   const isCritical = pct >= 95
-  const radius = 42
+  const remaining = Math.max(0, max - used)
+  const radius = 36
   const circumference = 2 * Math.PI * radius
   const offset = circumference - (pct / 100) * circumference
 
   return (
-    <Card className="flex flex-col items-center gap-4 p-6 text-center">
-      <div className="relative size-28">
+    <div className="flex items-center gap-4 rounded-2xl border border-border bg-card p-5">
+      <div className="relative size-20 shrink-0">
         <svg viewBox="0 0 100 100" className="size-full -rotate-90">
           <circle
             cx="50"
@@ -427,87 +481,33 @@ function UsageGauge({
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="font-display text-xl font-bold text-foreground">
+          <span className="font-display text-sm font-bold tabular-nums text-foreground">
             {Math.round(pct)}%
           </span>
         </div>
       </div>
 
-      <div>
-        <div className="flex items-center justify-center gap-1.5 text-sm font-medium text-foreground">
-          <Icon className="size-4 text-muted-foreground" aria-hidden="true" />
-          {label}
+      <div className="min-w-0">
+        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+          <Icon className="size-3.5 shrink-0" aria-hidden="true" />
+          <span className="truncate">{label}</span>
         </div>
-        <p className="mt-1 text-sm text-foreground">
-          <span className="font-display font-semibold">
-            {formatCount(used)}
-          </span>
-          <span className="text-muted-foreground">
-            {" "}
-            / {formatCount(max)} {unit}
-          </span>
+        <p className="mt-1 font-display text-lg font-bold tabular-nums text-foreground">
+          {formatCount(used)} / {formatCount(max)} {unit}
         </p>
         <p
           className={cn(
-            "mt-1 text-xs",
+            "mt-0.5 text-sm",
             isCritical
               ? "text-destructive"
               : isWarning
                 ? "text-amber-600"
-                : "text-muted-foreground"
+                : "text-emerald-600 dark:text-emerald-400"
           )}
         >
-          {isCritical
-            ? "Quota almost reached"
-            : isWarning
-              ? "Approaching the limit"
-              : `${formatCount(Math.max(0, max - used))} ${unit} left`}
+          {formatCount(remaining)} {unit} left
         </p>
       </div>
-    </Card>
-  )
-}
-
-function QuotaCard({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: ComponentType<{ className?: string }>
-  label: string
-  value: string
-}) {
-  return (
-    <Card className="flex flex-col items-center justify-center gap-3 p-6 text-center">
-      <div className="flex size-11 items-center justify-center rounded-lg bg-accent text-accent-foreground">
-        <Icon className="size-5" aria-hidden="true" />
-      </div>
-      <div>
-        <p className="text-sm font-medium text-foreground">{label}</p>
-        <p className="mt-1 font-display text-xl font-bold text-foreground">
-          {value}
-        </p>
-      </div>
-    </Card>
-  )
-}
-
-function DetailRow({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: ComponentType<{ className?: string }>
-  label: string
-  value: string
-}) {
-  return (
-    <div className="flex items-center justify-between py-3 text-sm">
-      <span className="flex items-center gap-2 text-muted-foreground">
-        <Icon className="size-4" aria-hidden="true" />
-        {label}
-      </span>
-      <span className="font-medium text-foreground">{value}</span>
     </div>
   )
 }
@@ -517,7 +517,7 @@ function formatDate(value: string): string {
   if (Number.isNaN(date.getTime())) return "—"
   return date.toLocaleDateString("en-US", {
     day: "numeric",
-    month: "short",
+    month: "long",
     year: "numeric",
   })
 }
