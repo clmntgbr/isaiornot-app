@@ -2,21 +2,14 @@
 
 import { Centrifuge } from "centrifuge"
 import { useEffect, useRef } from "react"
-import { getCentrifugoToken } from "./api"
-import { getUserChannel } from "./types"
+import { getRealtimeConnection } from "./api"
 
-function getCentrifugoUrl(): string {
-  const url = process.env.NEXT_PUBLIC_CENTRIFUGO_URL
-
-  if (!url) {
-    throw new Error("Missing NEXT_PUBLIC_CENTRIFUGO_URL")
-  }
-
-  return url
-}
-
+/**
+ * Connects to Centrifugo using GET /api/realtime/connection
+ * (`token`, `channel` = users:<uuid>, `wsUrl`), then subscribes to `channel`.
+ */
 export function useCentrifuge(
-  userId: string | undefined,
+  enabled: boolean,
   onPublication: (data: unknown) => void
 ) {
   const onPublicationRef = useRef(onPublication)
@@ -26,47 +19,66 @@ export function useCentrifuge(
   }, [onPublication])
 
   useEffect(() => {
-    if (!userId) return
+    if (!enabled) return
 
     let centrifuge: Centrifuge | null = null
+    let cancelled = false
 
-    try {
-      centrifuge = new Centrifuge(getCentrifugoUrl(), {
-        getToken: getCentrifugoToken,
-      })
+    const connect = async () => {
+      try {
+        const connection = await getRealtimeConnection()
+        if (cancelled) return
 
-      const channel = getUserChannel(userId)
-      const subscription = centrifuge.newSubscription(channel)
+        centrifuge = new Centrifuge(connection.wsUrl, {
+          getToken: async () => {
+            const next = await getRealtimeConnection()
+            return next.token
+          },
+        })
 
-      subscription.on("publication", (ctx) => {
-        console.log("[Centrifugo] publication", channel, ctx.data)
-        onPublicationRef.current(ctx.data)
-      })
+        const subscription = centrifuge.newSubscription(connection.channel)
 
-      subscription.on("subscribed", () => {
-        console.log("[Centrifugo] subscribed", channel)
-      })
+        subscription.on("publication", (ctx) => {
+          console.log(
+            "[Centrifugo] publication",
+            connection.channel,
+            ctx.data
+          )
+          onPublicationRef.current(ctx.data)
+        })
 
-      subscription.on("error", (ctx) => {
-        console.error("[Centrifugo] subscription error", channel, ctx)
-      })
+        subscription.on("subscribed", () => {
+          console.log("[Centrifugo] subscribed", connection.channel)
+        })
 
-      centrifuge.on("connected", () => {
-        console.log("[Centrifugo] connected")
-      })
+        subscription.on("error", (ctx) => {
+          console.error(
+            "[Centrifugo] subscription error",
+            connection.channel,
+            ctx
+          )
+        })
 
-      centrifuge.on("disconnected", (ctx) => {
-        console.warn("[Centrifugo] disconnected", ctx)
-      })
+        centrifuge.on("connected", () => {
+          console.log("[Centrifugo] connected", connection.wsUrl)
+        })
 
-      subscription.subscribe()
-      centrifuge.connect()
-    } catch (error) {
-      console.error("[Centrifugo] setup error", error)
+        centrifuge.on("disconnected", (ctx) => {
+          console.warn("[Centrifugo] disconnected", ctx)
+        })
+
+        subscription.subscribe()
+        centrifuge.connect()
+      } catch (error) {
+        console.error("[Centrifugo] setup error", error)
+      }
     }
+
+    void connect()
 
     return () => {
+      cancelled = true
       centrifuge?.disconnect()
     }
-  }, [userId])
+  }, [enabled])
 }

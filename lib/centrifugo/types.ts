@@ -43,6 +43,18 @@ export interface PaymentFailedEvent {
   userId?: string
 }
 
+/** Payload shared by user_created / user_updated (Clerk webhook or lazy-create). */
+export interface UserLifecycleEvent {
+  type: "user_created" | "user_updated"
+  userId: string
+  clerkId: string
+  firstName: string
+  lastName: string
+  email: string
+  createdAt: string
+  updatedAt: string
+}
+
 export type UserStreamEvent =
   | ScanStartedEvent
   | ScanCompletedEvent
@@ -50,6 +62,7 @@ export type UserStreamEvent =
   | SubscriptionUpdatedEvent
   | PaymentSucceededEvent
   | PaymentFailedEvent
+  | UserLifecycleEvent
 
 export function isUserStreamEvent(value: unknown): value is UserStreamEvent {
   if (!value || typeof value !== "object") return false
@@ -62,16 +75,23 @@ export function isUserStreamEvent(value: unknown): value is UserStreamEvent {
     type === "scan_failed" ||
     type === "subscription_updated" ||
     type === "payment_succeeded" ||
-    type === "payment_failed"
+    type === "payment_failed" ||
+    type === "user_created" ||
+    type === "user_updated"
   )
 }
 
 export function shouldRefetchScans(event: UserStreamEvent): boolean {
-  return (
-    event.type === "scan_completed" || event.type === "scan_failed"
-  )
+  return event.type === "scan_completed" || event.type === "scan_failed"
 }
 
+export function isUserLifecycleEvent(
+  event: UserStreamEvent
+): event is UserLifecycleEvent {
+  return event.type === "user_created" || event.type === "user_updated"
+}
+
+/** Builds `users:{internalUserId}` — prefer `channel` from `/api/realtime/connection`. */
 export function getUserChannel(userId: string): string {
   return `users:${userId}`
 }

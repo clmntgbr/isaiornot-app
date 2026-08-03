@@ -6,17 +6,22 @@ import { useSubscription } from "@/lib/subscription/context"
 import { useUser } from "@/lib/user/context"
 import { useCallback, useEffect, useRef } from "react"
 import { toast } from "sonner"
-import { isUserStreamEvent, shouldRefetchScans } from "./types"
+import {
+  isUserLifecycleEvent,
+  isUserStreamEvent,
+  shouldRefetchScans,
+} from "./types"
 import { useCentrifuge } from "./use-centrifuge"
 
 const REFRESH_DEBOUNCE_MS = 500
 
 export function UserCentrifugeListener() {
-  const { user, isLoading } = useUser()
+  const { user, isLoading, fetchUser } = useUser()
   const { fetchScans } = useScan()
   const { fetchStatistics } = useStatistics()
   const { fetchSubscription, markPaymentSucceeded } = useSubscription()
 
+  const fetchUserRef = useRef(fetchUser)
   const fetchScansRef = useRef(fetchScans)
   const fetchStatisticsRef = useRef(fetchStatistics)
   const fetchSubscriptionRef = useRef(fetchSubscription)
@@ -26,11 +31,13 @@ export function UserCentrifugeListener() {
   )
 
   useEffect(() => {
+    fetchUserRef.current = fetchUser
     fetchScansRef.current = fetchScans
     fetchStatisticsRef.current = fetchStatistics
     fetchSubscriptionRef.current = fetchSubscription
     markPaymentSucceededRef.current = markPaymentSucceeded
   }, [
+    fetchUser,
     fetchScans,
     fetchStatistics,
     fetchSubscription,
@@ -64,6 +71,11 @@ export function UserCentrifugeListener() {
       return
     }
 
+    if (isUserLifecycleEvent(data)) {
+      void fetchUserRef.current()
+      return
+    }
+
     if (shouldRefetchScans(data)) {
       debouncedRefreshScans()
       return
@@ -86,14 +98,15 @@ export function UserCentrifugeListener() {
     if (data.type === "payment_failed") {
       void fetchSubscriptionRef.current()
       toast.error("Échec du paiement", {
-        description: "Votre paiement n'a pas pu être traité. Veuillez réessayer.",
+        description:
+          "Votre paiement n'a pas pu être traité. Veuillez réessayer.",
       })
     }
   }, [debouncedRefreshScans])
 
-  const userId = !isLoading ? user?.id : undefined
+  const enabled = !isLoading && Boolean(user?.id)
 
-  useCentrifuge(userId, handlePublication)
+  useCentrifuge(enabled, handlePublication)
 
   return null
 }

@@ -1,22 +1,12 @@
-import { ModeToggle } from "@/components/mode-toggle"
+import { AppHeader } from "@/components/app-header"
 import { ThemeProvider } from "@/components/theme-provider"
-import { Button } from "@/components/ui/button"
 import { Toaster } from "@/components/ui/sonner"
 import { cn } from "@/lib/utils"
-import {
-  ClerkProvider,
-  SignedIn,
-  SignedOut,
-  SignInButton,
-  SignOutButton,
-  SignUpButton,
-  UserButton,
-} from "@clerk/nextjs"
+import { ClerkProvider } from "@clerk/nextjs"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Metadata } from "next"
 import { Geist_Mono, Roboto, Sora } from "next/font/google"
-import Link from "next/link"
 import "./globals.css"
-import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const roboto = Roboto({ subsets: ["latin"], variable: "--font-sans" })
 
@@ -50,35 +40,15 @@ export default function RootLayout({
       )}
     >
       <body>
-        <SpeedInsights/>
-        <ClerkProvider>
+        <SpeedInsights />
+        <ClerkProvider
+          signInFallbackRedirectUrl="/"
+          signInForceRedirectUrl="/"
+          signUpFallbackRedirectUrl="/account/setup"
+          signUpForceRedirectUrl="/account/setup"
+        >
           <ThemeProvider>
-            <header className="flex h-16 items-center justify-end gap-4 p-4">
-              <SignedOut>
-                <>
-                  <SignInButton />
-                  <SignUpButton>
-                    <button className="h-10 cursor-pointer rounded-full bg-purple-700 px-4 text-sm font-medium text-white sm:h-12 sm:px-5 sm:text-base">
-                      Sign Up
-                    </button>
-                  </SignUpButton>
-                </>
-              </SignedOut>
-              <SignedIn>
-                <Link href="/">
-                  <Button variant="ghost">Accueil</Button>
-                </Link>
-                <Link href="/pricing">
-                  <Button variant="ghost">Pricing</Button>
-                </Link>
-                <Link href="/subscription">
-                  <Button variant="ghost">Abonnement</Button>
-                </Link>
-                <ModeToggle />
-                <UserButton />
-                <SignOutButton />
-              </SignedIn>
-            </header>
+            <AppHeader />
             {children}
             <Toaster richColors />
           </ThemeProvider>

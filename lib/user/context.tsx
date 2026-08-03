@@ -1,10 +1,10 @@
 "use client"
 
 import { createContext, useContext } from "react"
-import { UserState } from "./types"
+import { User, UserState } from "./types"
 
 export interface UserContextType extends UserState {
-  fetchUser: () => Promise<void>
+  fetchUser: () => Promise<User | null>
 }
 
 export const UserContext = createContext<UserContextType | undefined>(undefined)

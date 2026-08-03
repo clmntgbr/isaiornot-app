@@ -36,6 +36,10 @@ Copy `.env.dist` to `.env.local` and fill in:
 ```bash
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_xxx
 CLERK_SECRET_KEY=sk_test_xxx
+NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=/
+NEXT_PUBLIC_CLERK_SIGN_IN_FORCE_REDIRECT_URL=/
+NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=/account/setup
+NEXT_PUBLIC_CLERK_SIGN_UP_FORCE_REDIRECT_URL=/account/setup
 NEXT_PUBLIC_BACKEND_API_URL=http://localhost:4000
 BACKEND_API_URL=http://localhost:4000
 NEXT_PUBLIC_CENTRIFUGO_URL=ws://localhost:8000/connection/websocket
@@ -43,7 +47,7 @@ NEXT_PUBLIC_CENTRIFUGO_URL=ws://localhost:8000/connection/websocket
 
 | Variable | Role |
 | --- | --- |
-| `NEXT_PUBLIC_CLERK_*` / `CLERK_SECRET_KEY` | Clerk auth |
+| `NEXT_PUBLIC_CLERK_*` / `CLERK_SECRET_KEY` | Clerk auth (sign-in → `/`, sign-up → `/account/setup`) |
 | `NEXT_PUBLIC_BACKEND_API_URL` / `BACKEND_API_URL` | Backend API base URL (proxied by Next routes) |
 | `NEXT_PUBLIC_CENTRIFUGO_URL` | WebSocket endpoint for realtime |
 
