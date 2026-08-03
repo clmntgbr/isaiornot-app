@@ -32,12 +32,9 @@ export function AccountShell({ children }: { children: React.ReactNode }) {
 
     if (!isReady && !isSetupRoute) {
       router.replace("/account/setup")
-      return
     }
 
-    if (isReady && isSetupRoute) {
-      router.replace("/")
-    }
+    // Setup → home redirect is owned by AccountSetup (min display time).
   }, [isLoaded, isLoading, isSignedIn, isReady, isSetupRoute, router])
 
   if (!isLoaded) {
