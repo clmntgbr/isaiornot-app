@@ -1,5 +1,6 @@
 "use client"
 
+import { InvoicesCard } from "@/components/invoices-card"
 import { PillBadge } from "@/components/pill-badge"
 import { QuotaMeter } from "@/components/quota-meter"
 import { PlanSkills } from "@/components/skill-badge"
@@ -177,7 +178,7 @@ function SubscriptionContent({
   return (
     <div className="flex flex-col gap-4">
       <section
-        className="animate-slide-up relative overflow-hidden rounded-2xl border border-primary/20 bg-linear-to-br from-primary/10 via-sky-500/5 to-background p-5 sm:p-6"
+        className="animate-slide-up relative overflow-hidden rounded-2xl border border-border bg-card p-5 sm:p-6"
         style={{ animationDelay: "0.08s" }}
       >
         <div className="grid items-stretch gap-5 lg:grid-cols-[1.35fr_1fr]">
@@ -307,62 +308,55 @@ function SubscriptionContent({
           </div>
         </div>
 
-        <div className="relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card p-6">
-          <div
-            className="pointer-events-none absolute -top-10 -right-10 size-40 rounded-full opacity-25 blur-3xl"
-            style={{
-              background:
-                "radial-gradient(circle, var(--primary), transparent 70%)",
-            }}
-          />
-          <div className="relative flex flex-1 flex-col">
-            <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-              <CreditCard className="size-5" aria-hidden="true" />
-            </div>
-            <h3 className="mt-4 font-display text-lg font-bold text-foreground">
-              Stripe customer portal
-            </h3>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Manage your payment method, download invoices, or change or cancel
-              your subscription.
-            </p>
+        <div className="flex flex-col rounded-2xl border border-border bg-card p-6">
+          <div className="flex size-10 items-center justify-center rounded-xl bg-muted text-muted-foreground">
+            <CreditCard className="size-5" aria-hidden="true" />
+          </div>
+          <h3 className="mt-4 font-display text-lg font-bold text-foreground">
+            Stripe customer portal
+          </h3>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Manage your payment method, download invoices, or change or cancel
+            your subscription.
+          </p>
 
-            <div className="mt-auto border-t border-border/70 pt-4">
-              {isFree ? (
-                <Button className="w-full" disabled>
+          <div className="mt-auto border-t border-border/70 pt-4">
+            {isFree ? (
+              <Button className="w-full" disabled>
+                <CreditCard className="size-4" aria-hidden="true" />
+                Free plan — no billing
+              </Button>
+            ) : (
+              <Button
+                className="w-full"
+                onClick={hasPortal ? onOpenPortal : onGoPricing}
+                disabled={portalLoading}
+              >
+                {portalLoading ? (
+                  <Loader2
+                    className="size-4 animate-spin"
+                    aria-hidden="true"
+                  />
+                ) : (
                   <CreditCard className="size-4" aria-hidden="true" />
-                  Free plan — no billing
-                </Button>
-              ) : (
-                <Button
-                  className="w-full"
-                  onClick={hasPortal ? onOpenPortal : onGoPricing}
-                  disabled={portalLoading}
-                >
-                  {portalLoading ? (
-                    <Loader2
-                      className="size-4 animate-spin"
-                      aria-hidden="true"
-                    />
-                  ) : (
-                    <CreditCard className="size-4" aria-hidden="true" />
-                  )}
-                  {hasPortal ? "Open billing portal" : "Choose a paid plan"}
-                </Button>
-              )}
-            </div>
+                )}
+                {hasPortal ? "Open billing portal" : "Choose a paid plan"}
+              </Button>
+            )}
           </div>
         </div>
       </section>
+
+      <InvoicesCard isFree={isFree} onGoPricing={onGoPricing} />
 
       {plan.slug !== "business" && (
         <section
           className="animate-slide-up"
           style={{ animationDelay: "0.26s" }}
         >
-          <div className="rounded-2xl border border-primary/20 bg-linear-to-br from-primary/8 via-sky-500/5 to-background p-5 sm:p-6">
+          <div className="rounded-2xl border border-border bg-card p-5 sm:p-6">
             <div className="flex items-start gap-3">
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-muted text-muted-foreground">
                 <Sparkles className="size-5" aria-hidden="true" />
               </div>
               <div>
