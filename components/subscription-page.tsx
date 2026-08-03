@@ -13,6 +13,7 @@ import { createBillingPortalSession } from "@/lib/subscription/api"
 import { useSubscription } from "@/lib/subscription/context"
 import type { Subscription } from "@/lib/subscription/types"
 import {
+  ArrowUpRight,
   CalendarClock,
   CreditCard,
   FileStack,
@@ -353,6 +354,34 @@ function SubscriptionContent({
           </div>
         </div>
       </section>
+
+      {plan.slug !== "business" && (
+        <section
+          className="animate-slide-up"
+          style={{ animationDelay: "0.26s" }}
+        >
+          <div className="rounded-2xl border border-primary/20 bg-linear-to-br from-primary/8 via-sky-500/5 to-background p-5 sm:p-6">
+            <div className="flex items-start gap-3">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+                <Sparkles className="size-5" aria-hidden="true" />
+              </div>
+              <div>
+                <h3 className="font-display text-lg font-bold text-foreground">
+                  Level up your plan
+                </h3>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Unlock the full pipeline, up to 1,000 scans per month, and
+                  video analysis.
+                </p>
+              </div>
+            </div>
+            <Button className="mt-5 w-full" onClick={onGoPricing}>
+              <ArrowUpRight className="size-4" aria-hidden="true" />
+              View plans
+            </Button>
+          </div>
+        </section>
+      )}
     </div>
   )
 }
