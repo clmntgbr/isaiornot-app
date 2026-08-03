@@ -264,14 +264,6 @@ export function Pricing({ onBack, currentPlanSlug }: PricingPageProps) {
             desc="All paid plans include support, with priority from Pro."
           />
         </div>
-
-        <Button
-          variant="ghost"
-          onClick={onBack}
-          className="text-muted-foreground"
-        >
-          ← Back to detector
-        </Button>
       </section>
     </div>
   )

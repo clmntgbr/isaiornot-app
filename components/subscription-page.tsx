@@ -370,9 +370,6 @@ function SubscriptionContent({
           <ArrowUpRight className="size-4" aria-hidden="true" />
           Change plan
         </Button>
-        <Button variant="ghost" className="sm:w-auto" onClick={onGoDetect}>
-          Back to detector
-        </Button>
       </div>
     </div>
   )
