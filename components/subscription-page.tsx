@@ -1,6 +1,7 @@
 "use client"
 
 import { InvoicesCard } from "@/components/invoices-card"
+import { PageHero } from "@/components/page-hero"
 import { PillBadge } from "@/components/pill-badge"
 import { QuotaMeter } from "@/components/quota-meter"
 import { PlanSkills } from "@/components/skill-badge"
@@ -77,6 +78,13 @@ export function SubscriptionPage({ onGoPricing }: SubscriptionPageProps) {
 
   return (
     <div className="container mx-auto flex max-w-6xl flex-col gap-8 p-4 pb-20">
+      <PageHero
+        badge="Billing & usage"
+        icon={Zap}
+        title="Your plan, quotas"
+        highlight="and billing"
+      />
+
       {isLoading && !subscription ? (
         <LoadingState />
       ) : !subscription || !(subscription.effectivePlan ?? subscription.plan) ? (
