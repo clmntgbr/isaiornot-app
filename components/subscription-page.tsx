@@ -256,7 +256,7 @@ function SubscriptionContent({
             </div>
           </div>
 
-          <div className="rounded-2xl border border-border/60 bg-card p-5 shadow-sm sm:p-6">
+          <div className="rounded-2xl border border-border/60 p-5 shadow-sm sm:p-6">
             <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
               <CalendarClock
                 className="size-4 text-primary"
@@ -285,7 +285,6 @@ function SubscriptionContent({
         </div>
       </section>
 
-      {/* Usage gauges row */}
       <section
         className="animate-slide-up grid gap-4 sm:grid-cols-3"
         style={{ animationDelay: "0.14s" }}
@@ -399,24 +398,6 @@ function SubscriptionContent({
                   Choose a paid plan
                 </Button>
               )}
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  variant="outline"
-                  className="flex-1"
-                  onClick={onGoPricing}
-                >
-                  <ArrowUpRight className="size-4" aria-hidden="true" />
-                  Change plan
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="flex-1"
-                  onClick={onGoDetect}
-                >
-                  <ArrowLeft className="size-4" aria-hidden="true" />
-                  Detector
-                </Button>
-              </div>
               <p className="text-center text-xs text-muted-foreground">
                 Secure payment — cancel anytime.
               </p>
