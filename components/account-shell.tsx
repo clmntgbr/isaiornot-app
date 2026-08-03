@@ -9,11 +9,7 @@ import { useUser } from "@/lib/user/context"
 import { useAuth } from "@clerk/nextjs"
 import { Loader2 } from "lucide-react"
 import { usePathname, useRouter } from "next/navigation"
-import { useEffect } from "react"
-
-function isPublicAppRoute(pathname: string): boolean {
-  return pathname === "/" || pathname.startsWith("/pricing")
-}
+import { useEffect, useRef } from "react"
 
 export function AccountShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -21,20 +17,28 @@ export function AccountShell({ children }: { children: React.ReactNode }) {
   const { isSignedIn, isLoaded } = useAuth()
   const { user, isLoading } = useUser()
   const isSetupRoute = pathname.startsWith("/account/setup")
-  const isPublicRoute = isPublicAppRoute(pathname)
   const isReady = Boolean(user?.id)
+
+  // Once the authenticated app providers have mounted, keep them mounted for the
+  // session so readiness flicker / refetch never remounts the whole data layer.
+  const keepProvidersRef = useRef(false)
+  if (isSignedIn && isReady && !isSetupRoute) {
+    keepProvidersRef.current = true
+  }
+  if (!isSignedIn) {
+    keepProvidersRef.current = false
+  }
+
+  const showAuthenticatedProviders =
+    Boolean(isSignedIn) && (isReady || keepProvidersRef.current) && !isSetupRoute
 
   useEffect(() => {
     if (!isLoaded || isLoading) return
-
-    // Guests can browse public pages; private routes are gated by Clerk middleware.
     if (!isSignedIn) return
 
     if (!isReady && !isSetupRoute) {
       router.replace("/account/setup")
     }
-
-    // Setup → home redirect is owned by AccountSetup (min display time).
   }, [isLoaded, isLoading, isSignedIn, isReady, isSetupRoute, router])
 
   if (!isLoaded) {
@@ -45,7 +49,6 @@ export function AccountShell({ children }: { children: React.ReactNode }) {
     )
   }
 
-  // Guest: public pages only need plans (pricing).
   if (!isSignedIn) {
     return (
       <PlanProvider>
@@ -58,16 +61,7 @@ export function AccountShell({ children }: { children: React.ReactNode }) {
     return <div className="mx-auto bg-background px-0">{children}</div>
   }
 
-  if (isLoading || !isReady) {
-    // On public routes, avoid blocking forever while redirecting to setup.
-    if (isPublicRoute) {
-      return (
-        <div className="flex min-h-[calc(100svh-4rem)] items-center justify-center">
-          <Loader2 className="size-8 animate-spin text-primary" />
-        </div>
-      )
-    }
-
+  if (!showAuthenticatedProviders) {
     return (
       <div className="flex min-h-[calc(100svh-4rem)] items-center justify-center">
         <Loader2 className="size-8 animate-spin text-primary" />
@@ -81,7 +75,15 @@ export function AccountShell({ children }: { children: React.ReactNode }) {
         <ScanProvider>
           <StatisticsProvider>
             <UserCentrifugeListener />
-            <div className="mx-auto bg-background px-0">{children}</div>
+            <div className="mx-auto bg-background px-0">
+              {isReady ? (
+                children
+              ) : (
+                <div className="flex min-h-[calc(100svh-4rem)] items-center justify-center">
+                  <Loader2 className="size-8 animate-spin text-primary" />
+                </div>
+              )}
+            </div>
           </StatisticsProvider>
         </ScanProvider>
       </SubscriptionProvider>

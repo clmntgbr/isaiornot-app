@@ -27,7 +27,7 @@ import {
   Video,
   Zap,
 } from "lucide-react"
-import { useEffect, useState, type ComponentType } from "react"
+import { useState, type ComponentType } from "react"
 import { toast } from "sonner"
 
 const STATUS_LABELS: Record<string, string> = {
@@ -64,12 +64,8 @@ export function SubscriptionPage({
   onGoPricing,
   onGoDetect,
 }: SubscriptionPageProps) {
-  const { subscription, isLoading, fetchSubscription } = useSubscription()
+  const { subscription, isLoading } = useSubscription()
   const [portalLoading, setPortalLoading] = useState(false)
-
-  useEffect(() => {
-    void fetchSubscription()
-  }, [fetchSubscription])
 
   const handleOpenPortal = async () => {
     setPortalLoading(true)
