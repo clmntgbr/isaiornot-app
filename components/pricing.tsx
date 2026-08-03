@@ -1,6 +1,7 @@
 "use client"
 
 import { PageHero } from "@/components/page-hero"
+import { PlanSkills } from "@/components/skill-badge"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { usePlan } from "@/lib/plan/context"
@@ -186,9 +187,10 @@ export function Pricing({ onBack, currentPlanSlug }: PricingPageProps) {
                   </p>
                 )}
 
-                <p className="mt-3 min-h-10 text-sm text-muted-foreground">
-                  {plan.description}
-                </p>
+                <PlanSkills
+                  quota={plan.quota}
+                  className="mt-3 flex min-h-10 flex-wrap content-start gap-2"
+                />
 
                 <Button
                   className="mt-5 w-full"

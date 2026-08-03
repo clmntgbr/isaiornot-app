@@ -50,7 +50,7 @@ export function PageHero({
         {highlightInline ? " " : null}
         <span
           className={cn(
-            "bg-linear-to-r from-primary via-blue-500 to-chart-5 bg-clip-text text-transparent",
+            "bg-linear-to-r from-sky-400 via-indigo-500 to-purple-500 bg-clip-text text-transparent",
             !highlightInline && "mt-1 block"
           )}
         >

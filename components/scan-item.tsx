@@ -1,7 +1,8 @@
 "use client"
 
-import { ScanDetailDrawer } from "@/components/scan-detail-drawer"
 import { MediaThumbnail } from "@/components/media-thumbnail"
+import { PillBadge } from "@/components/pill-badge"
+import { ScanDetailDrawer } from "@/components/scan-detail-drawer"
 import {
   CONFIDENCE_CONFIG,
   VERDICT_COLOR_VAR,
@@ -197,24 +198,31 @@ export function ScanItem({ item }: ScanItemProps) {
   )
 }
 
+const SCAN_PILL_CLASS =
+  "gap-1 border-border bg-muted px-2 py-0.5 font-normal tabular-nums text-muted-foreground"
+
 function SizeBadge({ size }: { size: number }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2 py-0.5 text-xs text-muted-foreground tabular-nums">
-      <HardDrive className="size-3" />
+    <PillBadge
+      icon={HardDrive}
+      iconClassName="size-3"
+      className={SCAN_PILL_CLASS}
+    >
       {formatBytes(size)}
-    </span>
+    </PillBadge>
   )
 }
 
 function CreatedAtBadge({ date }: { date: string }) {
   return (
-    <span
-      className="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2 py-0.5 text-xs text-muted-foreground tabular-nums"
+    <PillBadge
+      icon={Calendar}
+      iconClassName="size-3"
       title="Created at"
+      className={SCAN_PILL_CLASS}
     >
-      <Calendar className="size-3" />
       {formatCreatedAt(date)}
-    </span>
+    </PillBadge>
   )
 }
 
@@ -229,13 +237,14 @@ function formatCreatedAt(value: string): string {
 
 function DurationBadge({ duration }: { duration: number }) {
   return (
-    <span
-      className="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2 py-0.5 text-xs text-muted-foreground tabular-nums"
+    <PillBadge
+      icon={Timer}
+      iconClassName="size-3"
       title="Analysis duration"
+      className={SCAN_PILL_CLASS}
     >
-      <Timer className="size-3" />
       {formatScanDuration(duration)}
-    </span>
+    </PillBadge>
   )
 }
 
@@ -274,22 +283,26 @@ function formatScanDuration(ms: number): string {
 
 function ErrorBadge({ message }: { message?: string | null }) {
   return (
-    <span
-      className="inline-flex max-w-full items-center gap-1 rounded-full border border-destructive/20 bg-destructive/10 px-2 py-0.5 text-xs text-destructive"
+    <PillBadge
+      icon={CircleAlert}
+      iconClassName="size-3"
       title={message ?? "Analysis failed"}
+      className="max-w-full gap-1 border-destructive/20 bg-destructive/10 px-2 py-0.5 font-normal text-destructive"
     >
-      <CircleAlert className="size-3 shrink-0" />
       <span className="truncate">{message ?? "Analysis failed"}</span>
-    </span>
+    </PillBadge>
   )
 }
 
 function AnalyzingBadge() {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 text-xs text-primary">
-      <Loader2 className="size-3 shrink-0 animate-spin" />
+    <PillBadge
+      icon={Loader2}
+      iconClassName="size-3 animate-spin"
+      className="gap-1 border-primary/20 bg-primary/10 px-2 py-0.5 font-normal text-primary"
+    >
       Analyzing…
-    </span>
+    </PillBadge>
   )
 }
 
@@ -298,17 +311,18 @@ function VerdictBadge({ verdict }: { verdict: ScanVerdict }) {
   const Icon = VERDICT_ICONS[cfg.icon]
 
   return (
-    <span
+    <PillBadge
+      icon={Icon}
+      iconClassName="size-3"
       className={cn(
-        "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs",
+        "gap-1 px-2 py-0.5 font-normal",
         cfg.bg,
         cfg.color,
         cfg.border
       )}
     >
-      <Icon className="size-3" />
       {cfg.short}
-    </span>
+    </PillBadge>
   )
 }
 
@@ -317,18 +331,19 @@ function ConfidenceBadge({ confidence }: { confidence: ScanConfidence }) {
   const Icon = CONFIDENCE_ICONS[cfg.icon]
 
   return (
-    <span
+    <PillBadge
+      icon={Icon}
+      iconClassName="size-3"
+      title={cfg.label}
       className={cn(
-        "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs",
+        "gap-1 px-2 py-0.5 font-normal",
         cfg.bg,
         cfg.color,
         cfg.border
       )}
-      title={cfg.label}
     >
-      <Icon className="size-3" />
       {cfg.label}
-    </span>
+    </PillBadge>
   )
 }
 

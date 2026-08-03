@@ -1,7 +1,8 @@
 "use client"
 
 import { PageHero } from "@/components/page-hero"
-import { Badge } from "@/components/ui/badge"
+import { PillBadge } from "@/components/pill-badge"
+import { PlanSkills } from "@/components/skill-badge"
 import { Button } from "@/components/ui/button"
 import {
   formatBytes,
@@ -82,15 +83,6 @@ export function SubscriptionPage({
 
   return (
     <div className="container mx-auto flex max-w-6xl flex-col gap-8 p-4 pb-20">
-      <PageHero
-        badge="Billing & usage"
-        icon={Zap}
-        title="Your"
-        highlight="subscription"
-        highlightInline
-        subtitle="Track your plan, quota, and billing in one place."
-      />
-
       {isLoading && !subscription ? (
         <LoadingState />
       ) : !subscription || !(subscription.effectivePlan ?? subscription.plan) ? (
@@ -207,28 +199,31 @@ function SubscriptionContent({
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Plan banner — matches reference layout */}
       <section
         className="animate-slide-up relative overflow-hidden rounded-2xl border border-primary/20 bg-linear-to-br from-primary/10 via-sky-500/5 to-background p-5 sm:p-6"
         style={{ animationDelay: "0.08s" }}
       >
         <div className="grid items-stretch gap-5 lg:grid-cols-[1.35fr_1fr]">
           <div className="flex flex-col justify-center gap-5">
-            <div className="flex flex-wrap items-center gap-2.5">
-              <Badge
-                variant="outline"
-                className={cn("gap-1.5", STATUS_BG[subscription.status])}
+            <div className="flex flex-wrap items-center gap-2">
+              <PillBadge
+                className={
+                  STATUS_BG[subscription.status] ??
+                  "border-border bg-muted text-muted-foreground"
+                }
               >
                 <span className="size-1.5 rounded-full bg-current" />
                 {STATUS_LABELS[subscription.status] ?? subscription.status}
-              </Badge>
-              <span className="text-sm text-muted-foreground">
+              </PillBadge>
+              <PillBadge
+                icon={CalendarClock}
+                className="border-border bg-card text-muted-foreground"
+              >
                 Since {formatDate(subscription.startDate)}
-              </span>
+              </PillBadge>
             </div>
 
             <div>
-              <p className="text-sm text-muted-foreground">Your plan</p>
               <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
                 <h2 className="font-display text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl">
                   {plan.name}
@@ -244,11 +239,7 @@ function SubscriptionContent({
                   )}
                 </p>
               </div>
-              {plan.description ? (
-                <p className="mt-2 max-w-md text-sm text-muted-foreground">
-                  {plan.description}
-                </p>
-              ) : null}
+              <PlanSkills quota={quota} className="mt-3 flex flex-wrap gap-2" />
             </div>
           </div>
 
