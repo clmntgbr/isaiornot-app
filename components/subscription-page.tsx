@@ -199,7 +199,7 @@ function SubscriptionContent({
               Your plan
             </p>
             <div className="mt-1 flex flex-wrap items-baseline gap-3">
-              <span className="font-display text-4xl font-bold tracking-tight text-foreground">
+              <span className="font-display text-6xl font-extrabold tracking-tight text-foreground">
                 {plan.name}
               </span>
               <span className="font-display text-xl font-semibold text-primary">
