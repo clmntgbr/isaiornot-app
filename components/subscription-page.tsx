@@ -4,16 +4,27 @@ import { PillBadge } from "@/components/pill-badge"
 import { QuotaMeter } from "@/components/quota-meter"
 import { PlanSkills } from "@/components/skill-badge"
 import { Button } from "@/components/ui/button"
-import { formatPrice } from "@/lib/plan/pricing"
+import {
+  formatBytes,
+  formatCount,
+  formatPrice,
+} from "@/lib/plan/pricing"
+import { createBillingPortalSession } from "@/lib/subscription/api"
 import { useSubscription } from "@/lib/subscription/context"
 import type { Subscription } from "@/lib/subscription/types"
 import {
   CalendarClock,
   CreditCard,
+  FileStack,
+  HardDrive,
   Image as ImageIcon,
+  Loader2,
   Sparkles,
   Video,
+  Zap,
 } from "lucide-react"
+import { useState, type ComponentType } from "react"
+import { toast } from "sonner"
 
 const STATUS_LABELS: Record<string, string> = {
   active: "Active",
@@ -47,6 +58,20 @@ interface SubscriptionPageProps {
 
 export function SubscriptionPage({ onGoPricing }: SubscriptionPageProps) {
   const { subscription, isLoading } = useSubscription()
+  const [portalLoading, setPortalLoading] = useState(false)
+
+  const handleOpenPortal = async () => {
+    setPortalLoading(true)
+    try {
+      const { url } = await createBillingPortalSession()
+      window.location.assign(url)
+    } catch {
+      toast.error("Unable to open the customer portal", {
+        description: "Please try again in a moment.",
+      })
+      setPortalLoading(false)
+    }
+  }
 
   return (
     <div className="container mx-auto flex max-w-6xl flex-col gap-8 p-4 pb-20">
@@ -55,7 +80,12 @@ export function SubscriptionPage({ onGoPricing }: SubscriptionPageProps) {
       ) : !subscription || !(subscription.effectivePlan ?? subscription.plan) ? (
         <EmptyState onGoPricing={onGoPricing} />
       ) : (
-        <SubscriptionContent subscription={subscription} />
+        <SubscriptionContent
+          subscription={subscription}
+          portalLoading={portalLoading}
+          onOpenPortal={handleOpenPortal}
+          onGoPricing={onGoPricing}
+        />
       )}
     </div>
   )
@@ -68,6 +98,10 @@ function LoadingState() {
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="h-40 animate-pulse rounded-2xl bg-muted" />
         <div className="h-40 animate-pulse rounded-2xl bg-muted" />
+      </div>
+      <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
+        <div className="h-64 animate-pulse rounded-2xl bg-muted" />
+        <div className="h-64 animate-pulse rounded-2xl bg-muted" />
       </div>
       <p className="sr-only">Loading your subscription…</p>
     </div>
@@ -111,8 +145,14 @@ function EmptyState({ onGoPricing }: { onGoPricing: () => void }) {
 
 function SubscriptionContent({
   subscription,
+  portalLoading,
+  onOpenPortal,
+  onGoPricing,
 }: {
   subscription: Subscription
+  portalLoading: boolean
+  onOpenPortal: () => void
+  onGoPricing: () => void
 }) {
   const plan = subscription.effectivePlan ?? subscription.plan!
   const quota = plan.quota
@@ -127,6 +167,11 @@ function SubscriptionContent({
   const imagesMax = usage?.imagesMax ?? quota.maxImagesPerMonth
   const videosUsed = usage?.videosUsed ?? 0
   const videosMax = usage?.videosMax ?? quota.maxVideosPerMonth
+  const hasPortal = Boolean(subscription.stripeCustomerId)
+  const isFree = plan.price === 0 || plan.slug === "free"
+
+  const modelCount =
+    plan.slug === "free" ? 1 : plan.slug === "starter" ? 2 : 4
 
   return (
     <div className="flex flex-col gap-4">
@@ -223,6 +268,111 @@ function SubscriptionContent({
           lockedHint="Upgrade your plan to unlock."
         />
       </section>
+
+      <section
+        className="animate-slide-up grid gap-4 lg:grid-cols-[1.4fr_1fr]"
+        style={{ animationDelay: "0.2s" }}
+      >
+        <div className="rounded-2xl border border-border bg-card p-6">
+          <h3 className="font-display text-lg font-bold text-foreground">
+            What your plan includes
+          </h3>
+          <div className="mt-4 divide-y divide-border/70">
+            <DetailRow
+              icon={HardDrive}
+              label="Max image size"
+              value={formatBytes(quota.maxFileSizeImage)}
+            />
+            <DetailRow
+              icon={Zap}
+              label="Pipeline"
+              value={quota.fullPipeline ? "Full" : "Basic"}
+            />
+            <DetailRow
+              icon={Sparkles}
+              label="Detection models"
+              value={`${modelCount} model${modelCount > 1 ? "s" : ""}`}
+            />
+            <DetailRow
+              icon={FileStack}
+              label="Images / month"
+              value={formatCount(imagesMax)}
+            />
+            <DetailRow
+              icon={Video}
+              label="Videos / month"
+              value={formatCount(videosMax)}
+            />
+          </div>
+        </div>
+
+        <div className="relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card p-6">
+          <div
+            className="pointer-events-none absolute -top-10 -right-10 size-40 rounded-full opacity-25 blur-3xl"
+            style={{
+              background:
+                "radial-gradient(circle, var(--primary), transparent 70%)",
+            }}
+          />
+          <div className="relative flex flex-1 flex-col">
+            <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <CreditCard className="size-5" aria-hidden="true" />
+            </div>
+            <h3 className="mt-4 font-display text-lg font-bold text-foreground">
+              Stripe customer portal
+            </h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Manage your payment method, download invoices, or change or cancel
+              your subscription.
+            </p>
+
+            <div className="mt-auto border-t border-border/70 pt-4">
+              {isFree ? (
+                <Button className="w-full" disabled>
+                  <CreditCard className="size-4" aria-hidden="true" />
+                  Free plan — no billing
+                </Button>
+              ) : (
+                <Button
+                  className="w-full"
+                  onClick={hasPortal ? onOpenPortal : onGoPricing}
+                  disabled={portalLoading}
+                >
+                  {portalLoading ? (
+                    <Loader2
+                      className="size-4 animate-spin"
+                      aria-hidden="true"
+                    />
+                  ) : (
+                    <CreditCard className="size-4" aria-hidden="true" />
+                  )}
+                  {hasPortal ? "Open billing portal" : "Choose a paid plan"}
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  )
+}
+
+function DetailRow({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: ComponentType<{ className?: string }>
+  label: string
+  value: string
+}) {
+  return (
+    <div className="flex items-center justify-between gap-3 py-3 text-sm">
+      <span className="flex items-center gap-2 text-muted-foreground">
+        <Icon className="size-4" aria-hidden="true" />
+        {label}
+      </span>
+      <span className="font-semibold text-foreground">{value}</span>
     </div>
   )
 }
