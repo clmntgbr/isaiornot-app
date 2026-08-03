@@ -42,7 +42,7 @@ export function Pricing({ onBack, currentPlanSlug }: PricingPageProps) {
 
   const handleSelectPlan = async (planId: string) => {
     if (!createSubscription) {
-      toast.error("Connectez-vous pour souscrire à un plan")
+      toast.error("Sign in to subscribe to a plan")
       return
     }
 
@@ -50,7 +50,7 @@ export function Pricing({ onBack, currentPlanSlug }: PricingPageProps) {
     try {
       const result = await createSubscription(planId)
       if (!result?.url) {
-        toast.error("Impossible de créer l'abonnement")
+        toast.error("Unable to create subscription")
         return
       }
 
@@ -63,11 +63,11 @@ export function Pricing({ onBack, currentPlanSlug }: PricingPageProps) {
   return (
     <div className="container mx-auto flex max-w-6xl flex-col gap-8 p-4 pb-20">
       <PageHero
-        badge="Tarifs simples et transparents"
-        title="Choisissez le plan"
-        highlight="adapté à vos besoins"
+        badge="Simple, transparent pricing"
+        title="Choose the plan"
+        highlight="that fits your needs"
         highlightInline
-        subtitle="Détection d'images IA par multi-modèles. Changez ou annulez à tout moment."
+        subtitle="Multi-model AI image detection. Change or cancel anytime."
       >
         <div
           className="animate-fade-in mt-2 flex items-center gap-3"
@@ -79,12 +79,12 @@ export function Pricing({ onBack, currentPlanSlug }: PricingPageProps) {
               !annual ? "text-foreground" : "text-muted-foreground"
             )}
           >
-            Mensuel
+            Monthly
           </span>
           <Switch
             checked={annual}
             onCheckedChange={setAnnual}
-            aria-label="Facturation annuelle"
+            aria-label="Annual billing"
           />
           <span
             className={cn(
@@ -92,7 +92,7 @@ export function Pricing({ onBack, currentPlanSlug }: PricingPageProps) {
               annual ? "text-foreground" : "text-muted-foreground"
             )}
           >
-            Annuel
+            Annual
           </span>
           <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
             -20%
@@ -103,7 +103,7 @@ export function Pricing({ onBack, currentPlanSlug }: PricingPageProps) {
       {isLoading ? (
         <div className="flex items-center justify-center gap-2 py-20 text-muted-foreground">
           <Loader2 className="size-5 animate-spin" />
-          <span className="text-sm">Chargement des plans…</span>
+          <span className="text-sm">Loading plans…</span>
         </div>
       ) : error ? (
         <div className="py-20 text-center text-sm text-destructive">
@@ -143,7 +143,7 @@ export function Pricing({ onBack, currentPlanSlug }: PricingPageProps) {
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                     <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white shadow-md">
                       <BadgeCheck className="size-3 shrink-0" />
-                      Plan actuel
+                      Current plan
                     </span>
                   </div>
                 ) : isHighlight ? (
@@ -161,28 +161,28 @@ export function Pricing({ onBack, currentPlanSlug }: PricingPageProps) {
                   </h3>
                   <p className="mt-1 text-sm text-muted-foreground">
                     {isCurrent
-                      ? "Votre abonnement en cours"
-                      : meta.tagline !== "Le plus populaire" && meta.tagline}
+                      ? "Your current subscription"
+                      : meta.tagline !== "Most popular" && meta.tagline}
                   </p>
                 </div>
 
                 <div className="mt-4 flex items-baseline gap-1">
                   <span className="font-display text-4xl font-extrabold tracking-tight">
                     {plan.price === 0
-                      ? "Gratuit"
+                      ? "Free"
                       : formatPrice(plan.price, plan.currency)}
                   </span>
                   {plan.price > 0 && (
                     <span className="text-sm text-muted-foreground">
-                      /{annual ? "an" : "mois"}
+                      /{annual ? "year" : "month"}
                     </span>
                   )}
                 </div>
 
                 {annual && plan.price > 0 && (
                   <p className="mt-1 text-xs text-muted-foreground">
-                    Soit {monthlyEquivalent.toFixed(2).replace(".", ",")}
-                    {"\u00A0"}€/mois
+                    About {monthlyEquivalent.toFixed(2)}
+                    {"\u00A0"}€/month
                   </p>
                 )}
 
@@ -201,7 +201,7 @@ export function Pricing({ onBack, currentPlanSlug }: PricingPageProps) {
                   {pendingPlanId === plan.id ? (
                     <Loader2 className="size-4 animate-spin" />
                   ) : isCurrent ? (
-                    "Plan actuel"
+                    "Current plan"
                   ) : (
                     meta.cta
                   )}
@@ -252,16 +252,16 @@ export function Pricing({ onBack, currentPlanSlug }: PricingPageProps) {
       <section className="mt-14 flex flex-col items-center gap-6">
         <div className="grid w-full gap-4 sm:grid-cols-3">
           <InfoTile
-            title="Pas d'engagement"
-            desc="Annulez ou changez de plan à tout moment, sans frais cachés."
+            title="No commitment"
+            desc="Cancel or change plans anytime, with no hidden fees."
           />
           <InfoTile
-            title="Facturation à l'usage"
-            desc="Les scans non utilisées ne sont pas reportées au mois suivant."
+            title="Usage-based billing"
+            desc="Unused scans do not roll over to the next month."
           />
           <InfoTile
-            title="Support inclus"
-            desc="Tous les plans payants incluent un support, prioritaire dès Pro."
+            title="Support included"
+            desc="All paid plans include support, with priority from Pro."
           />
         </div>
 
@@ -270,7 +270,7 @@ export function Pricing({ onBack, currentPlanSlug }: PricingPageProps) {
           onClick={onBack}
           className="text-muted-foreground"
         >
-          ← Retour au détecteur
+          ← Back to detector
         </Button>
       </section>
     </div>

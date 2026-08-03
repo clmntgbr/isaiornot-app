@@ -19,30 +19,30 @@ export interface VerdictConfig {
 
 export const VERDICT_CONFIG: Record<ScanVerdict, VerdictConfig> = {
   likely_ai: {
-    short: "IA",
-    label: "Probablement IA",
+    short: "AI",
+    label: "Likely AI",
     description:
-      "Plusieurs indicateurs suggèrent une génération ou une manipulation par IA.",
+      "Several indicators suggest AI generation or manipulation.",
     icon: "bot",
     bg: "bg-destructive/10",
     color: "text-destructive",
     border: "border-destructive/20",
   },
   likely_real: {
-    short: "Réel",
-    label: "Probablement réel",
+    short: "Real",
+    label: "Likely real",
     description:
-      "Les signaux analysés sont cohérents avec un contenu authentique.",
+      "The analyzed signals are consistent with authentic content.",
     icon: "shield-check",
     bg: "bg-primary/10",
     color: "text-primary",
     border: "border-primary/20",
   },
   uncertain: {
-    short: "Incertain",
-    label: "Incertain",
+    short: "Uncertain",
+    label: "Uncertain",
     description:
-      "Les résultats sont mitigés ; une vérification humaine reste recommandée.",
+      "Results are mixed; human review is still recommended.",
     icon: "help-circle",
     bg: "bg-muted",
     color: "text-muted-foreground",
@@ -73,32 +73,32 @@ export interface ConfidenceConfig {
 
 export const CONFIDENCE_CONFIG: Record<ScanConfidence, ConfidenceConfig> = {
   high: {
-    short: "Élevée",
-    label: "Confiance élevée",
+    short: "High",
+    label: "High confidence",
     icon: "signal-high",
     bg: "bg-emerald-500/10",
     color: "text-emerald-700 dark:text-emerald-400",
     border: "border-emerald-500/20",
   },
   medium: {
-    short: "Moyenne",
-    label: "Confiance moyenne",
+    short: "Medium",
+    label: "Medium confidence",
     icon: "signal-medium",
     bg: "bg-amber-500/10",
     color: "text-amber-700 dark:text-amber-400",
     border: "border-amber-500/20",
   },
   low: {
-    short: "Faible",
-    label: "Confiance faible",
+    short: "Low",
+    label: "Low confidence",
     icon: "signal-low",
     bg: "bg-orange-500/10",
     color: "text-orange-700 dark:text-orange-400",
     border: "border-orange-500/20",
   },
   unknown: {
-    short: "Inconnue",
-    label: "Confiance inconnue",
+    short: "Unknown",
+    label: "Unknown confidence",
     icon: "help-circle",
     bg: "bg-muted",
     color: "text-muted-foreground",
@@ -107,10 +107,10 @@ export const CONFIDENCE_CONFIG: Record<ScanConfidence, ConfidenceConfig> = {
 }
 
 export const CONFIDENCE_LABEL: Record<ScanConfidence, string> = {
-  low: "faible",
-  medium: "moyenne",
-  high: "élevée",
-  unknown: "inconnue",
+  low: "low",
+  medium: "medium",
+  high: "high",
+  unknown: "unknown",
 }
 
 export interface InsightConfig {
@@ -121,24 +121,24 @@ export interface InsightConfig {
 
 export const INSIGHT_CONFIG: Record<InsightKey, InsightConfig> = {
   noise: {
-    label: "Bruit",
-    description: "Analyse du bruit résiduel et de sa cohérence spatiale.",
-    help: "Le bruit est une composante indésirable de l’image qui peut être causée par le processus de compression ou par des artefacts de quantification. Il peut être utilisé pour évaluer la qualité de l’image et la présence de compression.",
+    label: "Noise",
+    description: "Analysis of residual noise and its spatial consistency.",
+    help: "Noise is an unwanted component of the image that can come from compression or quantization artifacts. It can be used to assess image quality and the presence of compression.",
   },
   compression: {
     label: "Compression",
-    description: "Traces de compression et artefacts de quantification.",
-    help: "La compression est un processus qui réduit la taille d’un fichier image en supprimant des informations inutiles. Elle peut être utilisée pour réduire la taille des fichiers et pour améliorer la qualité de l’image.",
+    description: "Compression traces and quantization artifacts.",
+    help: "Compression reduces image file size by removing unnecessary information. It can be used to shrink files and may affect perceived image quality.",
   },
   frequency: {
-    label: "Fréquences",
-    description: "Répartition des hautes et basses fréquences de l’image.",
-    help: "Les hautes fréquences sont des détails fins et les basses fréquences sont des détails grossiers. La fréquence est utilisée pour évaluer la qualité de l’image et la présence de détails.",
+    label: "Frequencies",
+    description: "Distribution of high and low frequencies in the image.",
+    help: "High frequencies are fine details and low frequencies are coarse structure. Frequency analysis helps assess image quality and the presence of detail.",
   },
   histogram: {
-    label: "Histogramme",
-    description: "Distribution des intensités et anomalies statistiques.",
-    help: "L’histogramme est un graphique qui montre la distribution des intensités de l’image. Il peut être utilisé pour évaluer la qualité de l’image et la présence d’anomalies statistiques.",
+    label: "Histogram",
+    description: "Intensity distribution and statistical anomalies.",
+    help: "A histogram shows the distribution of image intensities. It can be used to assess image quality and the presence of statistical anomalies.",
   },
 }
 
@@ -169,9 +169,9 @@ export function isVideoMedia(
 }
 
 export function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} o`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} Ko`
-  return `${(bytes / (1024 * 1024)).toFixed(1)} Mo`
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
 export function getScanDisplayName(scan: {
@@ -180,7 +180,7 @@ export function getScanDisplayName(scan: {
 }): string {
   if (scan.filename) return scan.filename
   const first = scan.medias[0]
-  return first?.filename || first?.key || "Analyse"
+  return first?.filename || first?.key || "Scan"
 }
 
 export function getMediaThumbnailUrl(mediaId: string): string {

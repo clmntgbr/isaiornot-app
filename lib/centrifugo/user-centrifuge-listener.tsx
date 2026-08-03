@@ -89,17 +89,17 @@ export function UserCentrifugeListener() {
     if (data.type === "payment_succeeded") {
       void fetchSubscriptionRef.current()
       markPaymentSucceededRef.current()
-      toast.success("Paiement réussi", {
-        description: "Votre abonnement est maintenant actif.",
+      toast.success("Payment successful", {
+        description: "Your subscription is now active.",
       })
       return
     }
 
     if (data.type === "payment_failed") {
       void fetchSubscriptionRef.current()
-      toast.error("Échec du paiement", {
+      toast.error("Payment failed", {
         description:
-          "Votre paiement n'a pas pu être traité. Veuillez réessayer.",
+          "Your payment could not be processed. Please try again.",
       })
     }
   }, [debouncedRefreshScans])

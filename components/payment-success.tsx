@@ -51,14 +51,14 @@ export function PaymentSuccess({ onGoDetect }: PaymentSuccessProps) {
         style={{ animationDelay: "0.15s" }}
       >
         <h1 className="font-display text-3xl font-extrabold tracking-tight sm:text-4xl">
-          Vérification du paiement…
+          Verifying payment…
         </h1>
         <p className="text-balance text-muted-foreground">
-          Nous confirmons votre transaction. Votre abonnement sera activé
-          automatiquement.
+          We are confirming your transaction. Your subscription will be activated
+          automatically.
         </p>
         <p className="text-xs text-muted-foreground">
-          Redirection automatique dans quelques secondes…
+          Redirecting automatically in a few seconds…
         </p>
       </div>
     </div>

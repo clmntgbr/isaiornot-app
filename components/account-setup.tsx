@@ -48,9 +48,9 @@ export function AccountSetup() {
     try {
       const ready = await checkUserReady()
       if (!ready) {
-        toast.message("Compte en cours de création", {
+        toast.message("Account is being created", {
           description:
-            "Votre compte n’est pas encore prêt. Réessayez dans un instant.",
+            "Your account is not ready yet. Please try again in a moment.",
         })
       }
     } finally {
@@ -81,14 +81,14 @@ export function AccountSetup() {
         style={{ animationDelay: "0.15s" }}
       >
         <h1 className="font-display text-3xl font-extrabold tracking-tight sm:text-4xl">
-          Création de votre compte…
+          Creating your account…
         </h1>
         <p className="text-balance text-muted-foreground">
-          Nous finalisons la configuration de votre espace. Cela ne prend
-          généralement que quelques secondes.
+          We are finishing your workspace setup. This usually only takes a few
+          seconds.
         </p>
         <p className="text-xs text-muted-foreground">
-          En attente de confirmation…
+          Waiting for confirmation…
         </p>
       </div>
 
@@ -104,7 +104,7 @@ export function AccountSetup() {
         ) : (
           <RefreshCw className="size-4" />
         )}
-        Rafraîchir
+        Refresh
       </Button>
     </div>
   )

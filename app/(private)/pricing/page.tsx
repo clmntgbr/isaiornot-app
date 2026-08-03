@@ -1,19 +1,21 @@
 "use client"
 
 import { Pricing } from "@/components/pricing"
-import { useSubscription } from "@/lib/subscription/context"
+import { useOptionalSubscription } from "@/lib/subscription/context"
 import { useRouter } from "next/navigation"
 
 export default function PricingPage() {
   const router = useRouter()
-  const { subscription } = useSubscription()
+  const subscriptionContext = useOptionalSubscription()
 
   const currentPlanSlug =
-    subscription?.effectivePlan?.slug ?? subscription?.plan?.slug ?? null
+    subscriptionContext?.subscription?.effectivePlan?.slug ??
+    subscriptionContext?.subscription?.plan?.slug ??
+    null
 
   return (
     <Pricing
-      onBack={() => router.back()}
+      onBack={() => router.push("/")}
       currentPlanSlug={currentPlanSlug}
     />
   )

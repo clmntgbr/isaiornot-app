@@ -43,7 +43,7 @@ export function UploadDropzone({
     <div
       role="button"
       tabIndex={0}
-      aria-label="Zone de dépôt de fichiers"
+      aria-label="File drop zone"
       onClick={() => inputRef.current?.click()}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -84,7 +84,7 @@ export function UploadDropzone({
                   {item.previewUrl ? (
                     <img
                       src={item.previewUrl}
-                      alt={`Aperçu de ${item.file.name}`}
+                      alt={`Preview of ${item.file.name}`}
                       className="size-full object-cover"
                     />
                   ) : isVideo ? (
@@ -119,7 +119,7 @@ export function UploadDropzone({
               }}
             >
               <Send className="size-4" aria-hidden="true" />
-              Envoyer
+              Send
             </Button>
             <Button
               type="button"
@@ -133,7 +133,7 @@ export function UploadDropzone({
               }}
             >
               <X className="size-4" aria-hidden="true" />
-              Annuler
+              Cancel
             </Button>
           </div>
         </>
@@ -152,12 +152,12 @@ export function UploadDropzone({
           <div className="space-y-1">
             <p className="text-lg font-semibold text-foreground">
               {dragging
-                ? "Lâche tes fichiers ici !"
-                : "Dépose ton image ou vidéo ici"}
+                ? "Drop your files here!"
+                : "Drop your image or video here"}
             </p>
             <p className="text-sm text-muted-foreground">
-              JPG, PNG, WebP, MP4 ou MOV — 100 Mo max par fichier, plusieurs
-              fichiers acceptés
+              JPG, PNG, WebP, MP4 or MOV — 100 MB max per file, multiple files
+              accepted
             </p>
           </div>
         </>

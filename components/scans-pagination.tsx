@@ -56,7 +56,7 @@ export function ScansPagination({
         <PaginationItem>
           <PaginationPrevious
             href="#"
-            text="Précédent"
+            text="Previous"
             aria-disabled={page <= 1 || disabled}
             className={
               page <= 1 || disabled ? "pointer-events-none opacity-50" : undefined
@@ -94,7 +94,7 @@ export function ScansPagination({
         <PaginationItem>
           <PaginationNext
             href="#"
-            text="Suivant"
+            text="Next"
             aria-disabled={page >= totalPages || disabled}
             className={
               page >= totalPages || disabled

@@ -47,7 +47,7 @@ export function ScanDetailDrawer({
     <Drawer open={open} onOpenChange={onOpenChange} direction="right">
       <DrawerContent className="flex h-full w-[40vw]! max-w-[40vw]! flex-col gap-0 overflow-hidden p-6">
         <DrawerTitle className="sr-only">
-          {item ? getScanDisplayName(item) : "Détail de l'analyse"}
+          {item ? getScanDisplayName(item) : "Scan details"}
         </DrawerTitle>
         {item &&
           (isFailed ? (
@@ -57,11 +57,11 @@ export function ScanDetailDrawer({
               </div>
               <div className="space-y-2">
                 <p className="font-display text-lg font-bold">
-                  Analyse échouée
+                  Analysis failed
                 </p>
                 <p className="max-w-sm text-sm text-muted-foreground">
                   {item.message ??
-                    "L'analyse n'a pas pu être terminée. Veuillez réessayer."}
+                    "The analysis could not be completed. Please try again."}
                 </p>
               </div>
               {item.filename && (

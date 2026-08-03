@@ -101,7 +101,7 @@ export function ScanItem({ item }: ScanItemProps) {
           {thumbnail ? (
             <MediaThumbnail
               src={thumbnail}
-              alt={`Aperçu de ${displayName}`}
+              alt={`Preview of ${displayName}`}
               className={cn(
                 "transition-transform duration-500 ease-out",
                 canOpenDrawer && "group-hover:scale-110"
@@ -171,7 +171,7 @@ export function ScanItem({ item }: ScanItemProps) {
           ) : (
             <span
               className="inline-flex size-11 items-center justify-center rounded-full bg-primary/10"
-              aria-label="Analyse en cours"
+              aria-label="Analysis in progress"
             >
               <Loader2 className="size-5 animate-spin text-primary" />
             </span>
@@ -210,7 +210,7 @@ function CreatedAtBadge({ date }: { date: string }) {
   return (
     <span
       className="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2 py-0.5 text-xs text-muted-foreground tabular-nums"
-      title="Date de création"
+      title="Created at"
     >
       <Calendar className="size-3" />
       {formatCreatedAt(date)}
@@ -231,7 +231,7 @@ function DurationBadge({ duration }: { duration: number }) {
   return (
     <span
       className="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2 py-0.5 text-xs text-muted-foreground tabular-nums"
-      title="Durée d'analyse"
+      title="Analysis duration"
     >
       <Timer className="size-3" />
       {formatScanDuration(duration)}
@@ -249,7 +249,7 @@ function formatScanDuration(ms: number): string {
 
   const totalSeconds = ms / 1000
   if (totalSeconds < 60) {
-    return `${totalSeconds.toLocaleString("fr-FR", {
+    return `${totalSeconds.toLocaleString("en-US", {
       maximumFractionDigits: totalSeconds < 10 ? 1 : 0,
       minimumFractionDigits: 0,
     })}s`
@@ -269,17 +269,17 @@ function formatScanDuration(ms: number): string {
 
   const days = Math.floor(hours / 24)
   const remHours = hours % 24
-  return remHours > 0 ? `${days}j ${remHours}h` : `${days}j`
+  return remHours > 0 ? `${days}d ${remHours}h` : `${days}d`
 }
 
 function ErrorBadge({ message }: { message?: string | null }) {
   return (
     <span
       className="inline-flex max-w-full items-center gap-1 rounded-full border border-destructive/20 bg-destructive/10 px-2 py-0.5 text-xs text-destructive"
-      title={message ?? "Analyse échouée"}
+      title={message ?? "Analysis failed"}
     >
       <CircleAlert className="size-3 shrink-0" />
-      <span className="truncate">{message ?? "Analyse échouée"}</span>
+      <span className="truncate">{message ?? "Analysis failed"}</span>
     </span>
   )
 }
@@ -288,7 +288,7 @@ function AnalyzingBadge() {
   return (
     <span className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 text-xs text-primary">
       <Loader2 className="size-3 shrink-0 animate-spin" />
-      Analyse en cours…
+      Analyzing…
     </span>
   )
 }

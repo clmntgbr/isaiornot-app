@@ -31,14 +31,14 @@ import { useEffect, useState, type ComponentType } from "react"
 import { toast } from "sonner"
 
 const STATUS_LABELS: Record<string, string> = {
-  active: "Actif",
-  trialing: "Essai",
-  past_due: "Paiement en retard",
-  canceled: "Annulé",
-  cancelled: "Annulé",
-  unpaid: "Impayé",
-  incomplete: "Incomplet",
-  incomplete_expired: "Expiré",
+  active: "Active",
+  trialing: "Trial",
+  past_due: "Past due",
+  canceled: "Canceled",
+  cancelled: "Canceled",
+  unpaid: "Unpaid",
+  incomplete: "Incomplete",
+  incomplete_expired: "Expired",
 }
 
 const STATUS_BG: Record<string, string> = {
@@ -77,8 +77,8 @@ export function SubscriptionPage({
       const { url } = await createBillingPortalSession()
       window.location.assign(url)
     } catch {
-      toast.error("Impossible d'ouvrir le portail client", {
-        description: "Veuillez réessayer dans un instant.",
+      toast.error("Unable to open the customer portal", {
+        description: "Please try again in a moment.",
       })
       setPortalLoading(false)
     }
@@ -88,10 +88,10 @@ export function SubscriptionPage({
     <div className="mx-auto max-w-5xl px-4 py-10 sm:py-14">
       <div className="mb-8">
         <h1 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-          Mon abonnement
+          My subscription
         </h1>
         <p className="mt-2 text-muted-foreground">
-          Votre plan, votre consommation et votre facturation.
+          Your plan, usage, and billing.
         </p>
       </div>
 
@@ -125,7 +125,7 @@ function LoadingState() {
         <div className="h-64 animate-pulse rounded-xl bg-muted" />
         <div className="h-64 animate-pulse rounded-xl bg-muted" />
       </div>
-      <p className="sr-only">Chargement de votre abonnement…</p>
+      <p className="sr-only">Loading your subscription…</p>
     </div>
   )
 }
@@ -138,13 +138,13 @@ function EmptyState({ onGoPricing }: { onGoPricing: () => void }) {
       </div>
       <div>
         <h2 className="font-display text-lg font-semibold text-foreground">
-          Aucun abonnement actif
+          No active subscription
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Choisissez un forfait pour débloquer les analyses.
+          Choose a plan to unlock analyses.
         </p>
       </div>
-      <Button onClick={onGoPricing}>Voir les plans</Button>
+      <Button onClick={onGoPricing}>View plans</Button>
     </Card>
   )
 }
@@ -191,12 +191,12 @@ function SubscriptionContent({
                 {STATUS_LABELS[subscription.status] ?? subscription.status}
               </Badge>
               <span className="text-xs text-muted-foreground">
-                Depuis le {formatDate(subscription.startDate)}
+                Since {formatDate(subscription.startDate)}
               </span>
             </div>
 
             <p className="mt-6 text-sm text-muted-foreground">
-              Votre plan
+              Your plan
             </p>
             <div className="mt-1 flex flex-wrap items-baseline gap-3">
               <span className="font-display text-4xl font-bold tracking-tight text-foreground">
@@ -205,7 +205,7 @@ function SubscriptionContent({
               <span className="font-display text-xl font-semibold text-primary">
                 {formatPrice(plan.price, plan.currency)}
                 <span className="text-sm font-normal text-muted-foreground">
-                  /{plan.billingInterval === "annually" ? "an" : "mois"}
+                  /{plan.billingInterval === "annually" ? "year" : "month"}
                 </span>
               </span>
             </div>
@@ -220,16 +220,16 @@ function SubscriptionContent({
                 className="size-4 text-primary"
                 aria-hidden="true"
               />
-              Prochain renouvellement
+              Next renewal
             </div>
             <p className="mt-2 font-display text-xl font-semibold text-foreground">
               {formatDate(periodEnd)}
             </p>
             <div className="mt-5">
               <div className="mb-1.5 flex items-center justify-between text-xs text-muted-foreground">
-                <span>Cycle en cours</span>
+                <span>Current cycle</span>
                 <span className="font-medium text-foreground">
-                  {remainingDays} j restants
+                  {remainingDays} days left
                 </span>
               </div>
               <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
@@ -246,7 +246,7 @@ function SubscriptionContent({
       <div className="grid gap-4 sm:grid-cols-3">
         <UsageGauge
           icon={ImageIcon}
-          label="Analyses d'images"
+          label="Image analyses"
           used={imagesUsed}
           max={imagesMax}
           unit="analyses"
@@ -254,17 +254,17 @@ function SubscriptionContent({
         {videosMax > 0 ? (
           <UsageGauge
             icon={Video}
-            label="Analyses vidéo"
+            label="Video analyses"
             used={videosUsed}
             max={videosMax}
-            unit="vidéos"
+            unit="videos"
           />
         ) : (
-          <QuotaCard icon={Video} label="Analyses vidéo" value="Non incluses" />
+          <QuotaCard icon={Video} label="Video analyses" value="Not included" />
         )}
         <QuotaCard
           icon={HardDrive}
-          label="Rétention historique"
+          label="History retention"
           value={formatRetention(quota.historyRetention)}
         />
       </div>
@@ -272,37 +272,37 @@ function SubscriptionContent({
       <div className="grid gap-4 lg:grid-cols-2">
         <Card className="p-6">
           <h2 className="font-display text-lg font-semibold text-foreground">
-            Détails du plan
+            Plan details
           </h2>
           <p className="text-sm text-muted-foreground">
-            Limites et capacités incluses
+            Included limits and capabilities
           </p>
           <div className="mt-4 divide-y">
             <DetailRow
               icon={FileStack}
-              label="Analyses par mois"
+              label="Analyses per month"
               value={formatCount(imagesMax)}
             />
             <DetailRow
               icon={ImageIcon}
-              label="Taille max. image"
+              label="Max image size"
               value={formatBytes(quota.maxFileSizeImage)}
             />
             {quota.maxFileSizeVideo > 0 && (
               <DetailRow
                 icon={Video}
-                label="Taille max. vidéo"
+                label="Max video size"
                 value={formatBytes(quota.maxFileSizeVideo)}
               />
             )}
             <DetailRow
               icon={TrendingUp}
               label="Pipeline"
-              value={quota.fullPipeline ? "Complet" : "Basique (metadata & heuristiques)"}
+              value={quota.fullPipeline ? "Full" : "Basic (metadata & heuristics)"}
             />
             <DetailRow
               icon={Sparkles}
-              label="Modèles de détection"
+              label="Detection models"
               value={
                 plan.slug === "free"
                   ? "1"
@@ -313,7 +313,7 @@ function SubscriptionContent({
             />
             <DetailRow
               icon={Timer}
-              label="Rétention des résultats"
+              label="Result retention"
               value={formatRetention(quota.historyRetention)}
             />
           </div>
@@ -326,11 +326,11 @@ function SubscriptionContent({
             </div>
             <div>
               <h2 className="font-display text-lg font-semibold text-foreground">
-                Facturation
+                Billing
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Gérez votre moyen de paiement, téléchargez vos factures,
-                modifiez ou annulez votre abonnement.
+                Manage your payment method, download invoices, or change or
+                cancel your subscription.
               </p>
             </div>
           </div>
@@ -346,16 +346,16 @@ function SubscriptionContent({
                 ) : (
                   <ExternalLink className="size-4" aria-hidden="true" />
                 )}
-                Ouvrir le portail de facturation
+                Open billing portal
               </Button>
             ) : (
               <Button className="w-full" onClick={onGoPricing}>
                 <ArrowUpRight className="size-4" aria-hidden="true" />
-                Choisir un plan payant
+                Choose a paid plan
               </Button>
             )}
             <p className="text-center text-xs text-muted-foreground">
-              Paiement sécurisé — vous pouvez annuler à tout moment.
+              Secure payment — you can cancel anytime.
             </p>
           </div>
         </Card>
@@ -368,10 +368,10 @@ function SubscriptionContent({
           onClick={onGoPricing}
         >
           <ArrowUpRight className="size-4" aria-hidden="true" />
-          Changer de plan
+          Change plan
         </Button>
         <Button variant="ghost" className="sm:w-auto" onClick={onGoDetect}>
-          Retour au détecteur
+          Back to detector
         </Button>
       </div>
     </div>
@@ -461,10 +461,10 @@ function UsageGauge({
           )}
         >
           {isCritical
-            ? "Quota presque atteint"
+            ? "Quota almost reached"
             : isWarning
-              ? "Approche de la limite"
-              : `${formatCount(Math.max(0, max - used))} ${unit} restantes`}
+              ? "Approaching the limit"
+              : `${formatCount(Math.max(0, max - used))} ${unit} left`}
         </p>
       </div>
     </Card>
@@ -518,7 +518,7 @@ function DetailRow({
 function formatDate(value: string): string {
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return "—"
-  return date.toLocaleDateString("fr-FR", {
+  return date.toLocaleDateString("en-US", {
     day: "numeric",
     month: "short",
     year: "numeric",

@@ -1,5 +1,6 @@
 "use client"
 
+import { useAuth } from "@clerk/nextjs"
 import { useCallback, useEffect, useReducer } from "react"
 import { getUser } from "./api"
 import { UserContext } from "./context"
@@ -13,6 +14,7 @@ const initialState: UserState = {
 }
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
+  const { isSignedIn, isLoaded } = useAuth()
   const [state, dispatch] = useReducer(userReducer, initialState)
 
   const fetchUser = useCallback(async (): Promise<User | null> => {
@@ -30,13 +32,22 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   useEffect(() => {
+    if (!isLoaded) return
+
+    if (!isSignedIn) {
+      dispatch({ type: "CLEAR_USER" })
+      return
+    }
+
     void fetchUser()
-  }, [fetchUser])
+  }, [isLoaded, isSignedIn, fetchUser])
 
   return (
     <UserContext.Provider
       value={{
         ...state,
+        isLoading: !isLoaded || (Boolean(isSignedIn) && state.isLoading),
+        user: isSignedIn ? state.user : null,
         fetchUser,
       }}
     >

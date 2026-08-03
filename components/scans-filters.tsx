@@ -25,7 +25,7 @@ const ALL_VALUE = "all"
 
 const VERDICT_OPTIONS: { value: typeof ALL_VALUE | ScanVerdict; label: string }[] =
   [
-    { value: ALL_VALUE, label: "Tous" },
+    { value: ALL_VALUE, label: "All" },
     { value: "likely_real", label: VERDICT_CONFIG.likely_real.label },
     { value: "uncertain", label: VERDICT_CONFIG.uncertain.label },
     { value: "likely_ai", label: VERDICT_CONFIG.likely_ai.label },
@@ -35,7 +35,7 @@ const CONFIDENCE_OPTIONS: {
   value: typeof ALL_VALUE | ScanConfidence
   label: string
 }[] = [
-  { value: ALL_VALUE, label: "Toutes" },
+  { value: ALL_VALUE, label: "All" },
   { value: "high", label: CONFIDENCE_CONFIG.high.short },
   { value: "medium", label: CONFIDENCE_CONFIG.medium.short },
   { value: "low", label: CONFIDENCE_CONFIG.low.short },
@@ -43,10 +43,10 @@ const CONFIDENCE_OPTIONS: {
 
 const STATUS_OPTIONS: { value: typeof ALL_VALUE | ScanStatus; label: string }[] =
   [
-    { value: ALL_VALUE, label: "Tous" },
-    { value: "processing", label: "En cours" },
-    { value: "completed", label: "Terminé" },
-    { value: "failed", label: "Échoué" },
+    { value: ALL_VALUE, label: "All" },
+    { value: "processing", label: "In progress" },
+    { value: "completed", label: "Completed" },
+    { value: "failed", label: "Failed" },
   ]
 
 interface ScansFiltersProps {
@@ -120,7 +120,7 @@ export function ScansFilters({
       />
 
       <FilterDropdown
-        label="Confiance"
+        label="Confidence"
         value={filters.confidence ?? ALL_VALUE}
         options={CONFIDENCE_OPTIONS}
         disabled={disabled}
@@ -133,7 +133,7 @@ export function ScansFilters({
       />
 
       <FilterDropdown
-        label="Statut"
+        label="Status"
         value={filters.status ?? ALL_VALUE}
         options={STATUS_OPTIONS}
         disabled={disabled}
@@ -154,7 +154,7 @@ export function ScansFilters({
           className="text-muted-foreground"
         >
           <X className="size-3.5" />
-          Réinitialiser
+          Reset
         </Button>
       )}
     </div>
@@ -189,7 +189,7 @@ function FilterDropdown({
           className={cn(isActive && "border-primary/40 bg-primary/5 text-primary")}
         >
           <span className="text-muted-foreground">{label}:</span>
-          {selected?.label ?? "Tous"}
+          {selected?.label ?? "All"}
           <ChevronDown className="size-3.5 opacity-60" />
         </Button>
       </DropdownMenuTrigger>

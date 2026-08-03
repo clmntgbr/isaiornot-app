@@ -22,32 +22,51 @@ export function AppHeader() {
 
   return (
     <header className="flex h-16 items-center justify-end gap-4 p-4">
-      <SignedOut>
-        <>
-          <SignInButton forceRedirectUrl="/" fallbackRedirectUrl="/" />
-          <SignUpButton
-            forceRedirectUrl="/account/setup"
-            fallbackRedirectUrl="/account/setup"
-          >
-            <button className="h-10 cursor-pointer rounded-full bg-purple-700 px-4 text-sm font-medium text-white sm:h-12 sm:px-5 sm:text-base">
-              Sign Up
-            </button>
-          </SignUpButton>
-        </>
-      </SignedOut>
-      <SignedIn>
+      <nav className="mr-auto flex items-center gap-1">
         <Link href="/">
-          <Button variant="ghost">Accueil</Button>
+          <Button variant={pathname === "/" ? "secondary" : "ghost"}>
+            Home
+          </Button>
         </Link>
         <Link href="/pricing">
-          <Button variant="ghost">Pricing</Button>
+          <Button
+            variant={pathname.startsWith("/pricing") ? "secondary" : "ghost"}
+          >
+            Pricing
+          </Button>
         </Link>
-        <Link href="/subscription">
-          <Button variant="ghost">Abonnement</Button>
-        </Link>
-        <ModeToggle />
+        <SignedIn>
+          <Link href="/subscription">
+            <Button
+              variant={
+                pathname.startsWith("/subscription") ? "secondary" : "ghost"
+              }
+            >
+              Subscription
+            </Button>
+          </Link>
+        </SignedIn>
+      </nav>
+
+      <ModeToggle />
+
+      <SignedOut>
+        <SignInButton forceRedirectUrl="/" fallbackRedirectUrl="/">
+          <Button variant="outline">Sign in</Button>
+        </SignInButton>
+        <SignUpButton
+          forceRedirectUrl="/account/setup"
+          fallbackRedirectUrl="/account/setup"
+        >
+          <Button>Create account</Button>
+        </SignUpButton>
+      </SignedOut>
+
+      <SignedIn>
         <UserButton />
-        <SignOutButton />
+        <SignOutButton>
+          <Button variant="ghost">Sign out</Button>
+        </SignOutButton>
       </SignedIn>
     </header>
   )

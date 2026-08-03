@@ -38,7 +38,7 @@ export function InsightRow({
                   <button
                     type="button"
                     className="inline-flex shrink-0 text-muted-foreground transition-colors hover:text-foreground"
-                    aria-label={`Aide : ${label}`}
+                    aria-label={`Help: ${label}`}
                     onClick={(event) => event.preventDefault()}
                   >
                     <Info className="size-3.5" />

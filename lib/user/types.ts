@@ -11,6 +11,7 @@ export interface UserState {
 }
 
 export type UserAction =
-  | { type: "GET_USER"; payload: User }
+  | { type: "GET_USER"; payload: User | null }
   | { type: "GET_USER_ERROR"; payload: string }
   | { type: "GET_USER_LOADING"; payload: boolean }
+  | { type: "CLEAR_USER" }

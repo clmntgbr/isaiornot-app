@@ -66,15 +66,15 @@ export function PaymentCancel({
         style={{ animationDelay: "0.15s" }}
       >
         <h1 className="font-display text-3xl font-extrabold tracking-tight sm:text-4xl">
-          {isDeclined ? "Paiement refusé" : "Paiement annulé"}
+          {isDeclined ? "Payment declined" : "Payment canceled"}
         </h1>
         <p className="text-balance text-muted-foreground">
           {isDeclined
-            ? "Votre banque a refusé le paiement."
-            : "Vous avez annulé le paiement. Aucun montant n'a été débité."}
+            ? "Your bank declined the payment."
+            : "You canceled the payment. No amount was charged."}
         </p>
         <p className="text-xs text-muted-foreground">
-          Redirection automatique dans quelques secondes…
+          Redirecting automatically in a few seconds…
         </p>
       </div>
     </div>

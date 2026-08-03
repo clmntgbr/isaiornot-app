@@ -13,33 +13,33 @@ export interface PlanMeta {
 
 export const PLAN_META: Record<PlanSlug, PlanMeta> = {
   free: {
-    tagline: "Pour découvrir",
-    cta: "Commencer gratuitement",
+    tagline: "To explore",
+    cta: "Start for free",
     highlight: false,
-    extraFeatures: ["Support communautaire"],
+    extraFeatures: ["Community support"],
   },
   starter: {
-    tagline: "Pour démarrer",
-    cta: "Choisir Starter",
+    tagline: "To get started",
+    cta: "Choose Starter",
     highlight: false,
-    extraFeatures: ["Support email"],
+    extraFeatures: ["Email support"],
   },
   pro: {
-    tagline: "Le plus populaire",
-    cta: "Choisir Pro",
+    tagline: "Most popular",
+    cta: "Choose Pro",
     highlight: true,
-    extraFeatures: ["Support prioritaire"],
+    extraFeatures: ["Priority support"],
   },
   business: {
-    tagline: "Pour les équipes",
-    cta: "Choisir Business",
+    tagline: "For teams",
+    cta: "Choose Business",
     highlight: false,
-    extraFeatures: ["Support dédié", "Détail par sous-signal"],
+    extraFeatures: ["Dedicated support", "Per sub-signal detail"],
   },
 }
 
 export function formatPrice(cents: number, currency: string): string {
-  return new Intl.NumberFormat("fr-FR", {
+  return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: currency.toUpperCase(),
     minimumFractionDigits: 0,
@@ -75,40 +75,44 @@ export function getPlanForInterval(
 
 export function getQuotaFeatures(quota: Quota): string[] {
   const features: string[] = [
-    `${quota.maxImagesPerMonth.toLocaleString("fr-FR")} images / mois`,
+    `${quota.maxImagesPerMonth.toLocaleString("en-US")} images / month`,
   ]
 
   if (quota.maxVideosPerMonth > 0) {
     features.push(
-      `${quota.maxVideosPerMonth.toLocaleString("fr-FR")} vidéos / mois`
+      `${quota.maxVideosPerMonth.toLocaleString("en-US")} videos / month`
     )
   } else {
-    features.push("Vidéos non incluses")
+    features.push("Videos not included")
   }
 
-  features.push(`Images jusqu'à ${formatBytes(quota.maxFileSizeImage)}`)
+  features.push(`Images up to ${formatBytes(quota.maxFileSizeImage)}`)
 
   if (quota.maxFileSizeVideo > 0) {
-    features.push(`Vidéos jusqu'à ${formatBytes(quota.maxFileSizeVideo)}`)
+    features.push(`Videos up to ${formatBytes(quota.maxFileSizeVideo)}`)
   }
 
-  features.push(quota.fullPipeline ? "Pipeline complet" : "Pipeline standard (metadata & heuristiques)")
-  features.push(`Historique ${formatRetention(quota.historyRetention)}`)
+  features.push(
+    quota.fullPipeline
+      ? "Full pipeline"
+      : "Standard pipeline (metadata & heuristics)"
+  )
+  features.push(`History ${formatRetention(quota.historyRetention)}`)
 
   return features
 }
 
 export function formatBytes(bytes: number): string {
   if (bytes <= 0) return "—"
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} Ko`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`
   if (bytes < 1024 * 1024 * 1024) {
-    return `${(bytes / (1024 * 1024)).toFixed(0)} Mo`
+    return `${(bytes / (1024 * 1024)).toFixed(0)} MB`
   }
-  return `${(bytes / (1024 * 1024 * 1024)).toFixed(0)} Go`
+  return `${(bytes / (1024 * 1024 * 1024)).toFixed(0)} GB`
 }
 
 export function formatCount(value: number): string {
-  return value.toLocaleString("fr-FR")
+  return value.toLocaleString("en-US")
 }
 
 /** Go duration in nanoseconds → human label */
@@ -117,12 +121,14 @@ export function formatRetention(nanoseconds: number): string {
 
   if (days >= 365) {
     const years = Math.round(days / 365)
-    return `${years} an${years > 1 ? "s" : ""}`
+    return `${years} year${years > 1 ? "s" : ""}`
   }
 
   if (days >= 30) {
-    return `${Math.round(days / 30)} mois`
+    const months = Math.round(days / 30)
+    return `${months} month${months > 1 ? "s" : ""}`
   }
 
-  return `${Math.round(days)} jours`
+  const roundedDays = Math.round(days)
+  return `${roundedDays} day${roundedDays > 1 ? "s" : ""}`
 }

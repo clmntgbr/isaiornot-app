@@ -20,7 +20,7 @@ export function ModeToggle() {
         size="icon"
         className="cursor-pointer"
         disabled
-        aria-label="Changer le thème"
+        aria-label="Toggle theme"
       />
     )
   }
@@ -34,7 +34,7 @@ export function ModeToggle() {
       size="icon"
       className="cursor-pointer"
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      aria-label={isDark ? "Passer en mode clair" : "Passer en mode sombre"}
+      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
     >
       {isDark ? <Sun /> : <Moon />}
     </Button>
