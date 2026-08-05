@@ -10,6 +10,7 @@ import {
   formatBytes,
   formatCount,
   formatPrice,
+  formatRetention,
 } from "@/lib/plan/pricing"
 import { createBillingPortalSession } from "@/lib/subscription/api"
 import { useSubscription } from "@/lib/subscription/context"
@@ -20,6 +21,7 @@ import {
   CreditCard,
   FileStack,
   HardDrive,
+  History,
   Image as ImageIcon,
   Loader2,
   Sparkles,
@@ -312,6 +314,11 @@ function SubscriptionContent({
               icon={Video}
               label="Videos / month"
               value={formatCount(videosMax)}
+            />
+            <DetailRow
+              icon={History}
+              label="Historical data retention"
+              value={formatRetention(quota.historyRetention)}
             />
           </div>
         </div>
