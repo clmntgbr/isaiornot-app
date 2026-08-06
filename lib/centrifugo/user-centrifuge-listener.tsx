@@ -1,5 +1,6 @@
 "use client"
 
+import { useQuota } from "@/lib/quota/context"
 import { useScan } from "@/lib/scan/context"
 import { useStatistics } from "@/lib/statistics/context"
 import { useSubscription } from "@/lib/subscription/context"
@@ -20,11 +21,13 @@ export function UserCentrifugeListener() {
   const { fetchScans } = useScan()
   const { fetchStatistics } = useStatistics()
   const { fetchSubscription, markPaymentSucceeded } = useSubscription()
+  const { fetchQuota } = useQuota()
 
   const fetchUserRef = useRef(fetchUser)
   const fetchScansRef = useRef(fetchScans)
   const fetchStatisticsRef = useRef(fetchStatistics)
   const fetchSubscriptionRef = useRef(fetchSubscription)
+  const fetchQuotaRef = useRef(fetchQuota)
   const markPaymentSucceededRef = useRef(markPaymentSucceeded)
   const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined
@@ -35,12 +38,14 @@ export function UserCentrifugeListener() {
     fetchScansRef.current = fetchScans
     fetchStatisticsRef.current = fetchStatistics
     fetchSubscriptionRef.current = fetchSubscription
+    fetchQuotaRef.current = fetchQuota
     markPaymentSucceededRef.current = markPaymentSucceeded
   }, [
     fetchUser,
     fetchScans,
     fetchStatistics,
     fetchSubscription,
+    fetchQuota,
     markPaymentSucceeded,
   ])
 
@@ -78,16 +83,24 @@ export function UserCentrifugeListener() {
 
     if (shouldRefetchScans(data)) {
       debouncedRefreshScans()
+      void fetchQuotaRef.current()
+      return
+    }
+
+    if (data.type === "quota_updated") {
+      void fetchQuotaRef.current()
       return
     }
 
     if (data.type === "subscription_updated") {
       void fetchSubscriptionRef.current()
+      void fetchQuotaRef.current()
       return
     }
 
     if (data.type === "payment_succeeded") {
       void fetchSubscriptionRef.current()
+      void fetchQuotaRef.current()
       markPaymentSucceededRef.current()
       toast.success("Payment successful", {
         description: "Your subscription is now active.",

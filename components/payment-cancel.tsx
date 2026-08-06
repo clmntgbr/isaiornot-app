@@ -35,7 +35,7 @@ export function PaymentCancel({
       }
 
   return (
-    <div className="relative container mx-auto flex min-h-[calc(100svh-4rem)] max-w-lg flex-col items-center justify-center gap-4 px-4 text-center">
+    <div className="relative container mx-auto flex min-h-svh max-w-lg flex-col items-center justify-center gap-4 px-4 text-center">
       <div className="bg-grid mask-fade-b pointer-events-none absolute inset-0 -z-10 opacity-40" />
       <div
         className="pointer-events-none absolute top-1/2 left-1/2 -z-10 size-100 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-20 blur-3xl"

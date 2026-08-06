@@ -8,6 +8,7 @@ import {
   SignInButton,
   SignOutButton,
   SignUpButton,
+  useAuth,
   UserButton,
 } from "@clerk/nextjs"
 import Link from "next/link"
@@ -15,8 +16,13 @@ import { usePathname } from "next/navigation"
 
 export function AppHeader() {
   const pathname = usePathname()
+  const { isLoaded, isSignedIn } = useAuth()
 
-  if (pathname.startsWith("/account/setup")) {
+  if (
+    pathname.startsWith("/account/setup") ||
+    pathname.startsWith("/subscription/success") ||
+    pathname.startsWith("/subscription/cancel")
+  ) {
     return null
   }
 
@@ -35,7 +41,7 @@ export function AppHeader() {
             Pricing
           </Button>
         </Link>
-        <SignedIn>
+        {isLoaded && isSignedIn ? (
           <Link href="/subscription">
             <Button
               variant={
@@ -45,29 +51,35 @@ export function AppHeader() {
               Subscription
             </Button>
           </Link>
-        </SignedIn>
+        ) : null}
       </nav>
 
       <ModeToggle />
 
-      <SignedOut>
-        <SignInButton forceRedirectUrl="/" fallbackRedirectUrl="/">
-          <Button variant="outline">Sign in</Button>
-        </SignInButton>
-        <SignUpButton
-          forceRedirectUrl="/account/setup"
-          fallbackRedirectUrl="/account/setup"
-        >
-          <Button>Create account</Button>
-        </SignUpButton>
-      </SignedOut>
+      {!isLoaded ? (
+        <div className="size-8 animate-pulse rounded-full bg-muted" />
+      ) : (
+        <>
+          <SignedOut>
+            <SignInButton forceRedirectUrl="/" fallbackRedirectUrl="/">
+              <Button variant="outline">Sign in</Button>
+            </SignInButton>
+            <SignUpButton
+              forceRedirectUrl="/account/setup"
+              fallbackRedirectUrl="/account/setup"
+            >
+              <Button>Create account</Button>
+            </SignUpButton>
+          </SignedOut>
 
-      <SignedIn>
-        <UserButton />
-        <SignOutButton>
-          <Button variant="ghost">Sign out</Button>
-        </SignOutButton>
-      </SignedIn>
+          <SignedIn>
+            <UserButton />
+            <SignOutButton>
+              <Button variant="ghost">Sign out</Button>
+            </SignOutButton>
+          </SignedIn>
+        </>
+      )}
     </header>
   )
 }

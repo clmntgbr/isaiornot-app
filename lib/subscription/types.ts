@@ -1,19 +1,5 @@
 import type { Plan } from "@/lib/plan/types"
 
-export interface QuotaUsage {
-  periodStart: string
-  periodEnd: string
-  imagesUsed: number
-  imagesMax: number
-  imagesLeft: number
-  videosUsed: number
-  videosMax: number
-  videosLeft: number
-  maxFileSizeImage: number
-  maxFileSizeVideo: number
-  fullPipeline: boolean
-}
-
 export interface Subscription {
   id: string
   status: string
@@ -24,7 +10,6 @@ export interface Subscription {
   quotaPeriodStart: string
   plan: Plan | null
   effectivePlan: Plan | null
-  quotaUsage: QuotaUsage | null
   createdAt: string
   updatedAt: string
 }

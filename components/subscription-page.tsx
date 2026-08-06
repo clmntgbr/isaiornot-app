@@ -12,6 +12,7 @@ import {
   formatPrice,
   formatRetention,
 } from "@/lib/plan/pricing"
+import { useQuota } from "@/lib/quota/context"
 import { createBillingPortalSession } from "@/lib/subscription/api"
 import { useSubscription } from "@/lib/subscription/context"
 import type { Subscription } from "@/lib/subscription/types"
@@ -166,9 +167,9 @@ function SubscriptionContent({
   onOpenPortal: () => void
   onGoPricing: () => void
 }) {
+  const { quota: usage } = useQuota()
   const plan = subscription.effectivePlan ?? subscription.plan!
   const quota = plan.quota
-  const usage = subscription.quotaUsage
 
   const periodStart = usage?.periodStart ?? subscription.startDate
   const periodEnd = usage?.periodEnd ?? subscription.endDate

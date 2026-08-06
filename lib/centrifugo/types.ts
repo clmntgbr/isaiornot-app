@@ -33,6 +33,12 @@ export interface SubscriptionUpdatedEvent {
   userId?: string
 }
 
+export interface QuotaUpdatedEvent {
+  type: "quota_updated"
+  userId: string
+  updatedAt: string
+}
+
 export interface PaymentSucceededEvent {
   type: "payment_succeeded"
   userId?: string
@@ -60,6 +66,7 @@ export type UserStreamEvent =
   | ScanCompletedEvent
   | ScanFailedEvent
   | SubscriptionUpdatedEvent
+  | QuotaUpdatedEvent
   | PaymentSucceededEvent
   | PaymentFailedEvent
   | UserLifecycleEvent
@@ -74,6 +81,7 @@ export function isUserStreamEvent(value: unknown): value is UserStreamEvent {
     type === "scan_completed" ||
     type === "scan_failed" ||
     type === "subscription_updated" ||
+    type === "quota_updated" ||
     type === "payment_succeeded" ||
     type === "payment_failed" ||
     type === "user_created" ||
