@@ -9,7 +9,8 @@ import {
 export interface SubscriptionContextType extends SubscriptionState {
   fetchSubscription: () => Promise<void>
   createSubscription: (
-    planId: string
+    planId: string,
+    options?: { prorationDate?: number }
   ) => Promise<CreateSubscriptionResponse | null>
   markPaymentSucceeded: () => void
   resetPaymentSucceeded: () => void

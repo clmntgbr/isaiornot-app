@@ -40,10 +40,18 @@ export function SubscriptionProvider({
   }, [])
 
   const createSubscription = useCallback(
-    async (planId: string): Promise<CreateSubscriptionResponse | null> => {
+    async (
+      planId: string,
+      options?: { prorationDate?: number }
+    ): Promise<CreateSubscriptionResponse | null> => {
       try {
         dispatch({ type: "CREATE_SUBSCRIPTION_LOADING", payload: true })
-        const result = await createSubscriptionRequest({ planId })
+        const result = await createSubscriptionRequest({
+          planId,
+          ...(options?.prorationDate != null
+            ? { prorationDate: options.prorationDate }
+            : {}),
+        })
         dispatch({ type: "CREATE_SUBSCRIPTION_SUCCESS" })
         return result
       } catch {
@@ -52,6 +60,8 @@ export function SubscriptionProvider({
           payload: "Failed to create subscription",
         })
         return null
+      } finally {
+        dispatch({ type: "CREATE_SUBSCRIPTION_LOADING", payload: false })
       }
     },
     []

@@ -16,10 +16,30 @@ export interface Subscription {
 
 export interface CreateSubscriptionRequest {
   planId: string
+  prorationDate?: number
 }
 
 export interface CreateSubscriptionResponse {
-  url: string
+  url?: string
+}
+
+export interface SubscriptionPreviewLine {
+  description: string
+  amount: number
+  proration: boolean
+}
+
+export interface SubscriptionPreview {
+  requiresCheckout: boolean
+  currency?: string
+  amountDue?: number
+  subtotal?: number
+  total?: number
+  prorationDate?: number
+  lines?: SubscriptionPreviewLine[]
+  targetPlanName?: string
+  targetPlanPrice?: number
+  url?: string
 }
 
 export interface SubscriptionState {

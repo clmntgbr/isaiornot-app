@@ -1,6 +1,7 @@
 "use client"
 
 import { PageHero } from "@/components/page-hero"
+import { PlanChangeDrawer } from "@/components/plan-change-drawer"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { usePlan } from "@/lib/plan/context"
@@ -11,7 +12,9 @@ import {
   getPlanForInterval,
   getQuotaFeatures,
 } from "@/lib/plan/pricing"
+import { previewSubscription } from "@/lib/subscription/api"
 import { useOptionalSubscription } from "@/lib/subscription/context"
+import type { SubscriptionPreview } from "@/lib/subscription/types"
 import { cn } from "@/lib/utils"
 import { BadgeCheck, Check, Loader2, Zap } from "lucide-react"
 import { useState } from "react"
@@ -28,9 +31,13 @@ export function Pricing({ onBack, currentPlanSlug }: PricingPageProps) {
   const subscriptionContext = useOptionalSubscription()
   const [annual, setAnnual] = useState(false)
   const [pendingPlanId, setPendingPlanId] = useState<string | null>(null)
+  const [previewPlanId, setPreviewPlanId] = useState<string | null>(null)
+  const [preview, setPreview] = useState<SubscriptionPreview | null>(null)
+  const [drawerOpen, setDrawerOpen] = useState(false)
   const interval = annual ? "annually" : "monthly"
 
   const createSubscription = subscriptionContext?.createSubscription
+  const fetchSubscription = subscriptionContext?.fetchSubscription
   const isCreating = subscriptionContext?.isCreating ?? false
   const subscription = subscriptionContext?.subscription ?? null
 
@@ -48,15 +55,74 @@ export function Pricing({ onBack, currentPlanSlug }: PricingPageProps) {
 
     setPendingPlanId(planId)
     try {
-      const result = await createSubscription(planId)
-      if (!result?.url) {
-        toast.error("Unable to create subscription")
+      const nextPreview = await previewSubscription(planId)
+
+      if (nextPreview.requiresCheckout) {
+        if (nextPreview.url) {
+          window.location.assign(nextPreview.url)
+          return
+        }
+
+        const result = await createSubscription(planId)
+        if (!result?.url) {
+          toast.error("Unable to create subscription")
+          return
+        }
+
+        window.location.assign(result.url)
         return
       }
 
-      window.location.assign(result.url)
+      setPreviewPlanId(planId)
+      setPreview(nextPreview)
+      setDrawerOpen(true)
+    } catch {
+      toast.error("Unable to preview plan change", {
+        description: "Please try again in a moment.",
+      })
     } finally {
       setPendingPlanId(null)
+    }
+  }
+
+  const handleConfirmPlanChange = async () => {
+    if (!createSubscription || !previewPlanId || preview?.prorationDate == null) {
+      toast.error("Unable to confirm plan change")
+      return
+    }
+
+    const result = await createSubscription(previewPlanId, {
+      prorationDate: preview.prorationDate,
+    })
+
+    if (!result) {
+      toast.error("Unable to change plan", {
+        description: "Please try again in a moment.",
+      })
+      return
+    }
+
+    if (result.url) {
+      window.location.assign(result.url)
+      return
+    }
+
+    toast.success("Plan updated", {
+      description: preview.targetPlanName
+        ? `You are now on ${preview.targetPlanName}.`
+        : "Your subscription has been updated.",
+    })
+    setDrawerOpen(false)
+    setPreview(null)
+    setPreviewPlanId(null)
+    await fetchSubscription?.()
+  }
+
+  const handleDrawerOpenChange = (open: boolean) => {
+    setDrawerOpen(open)
+    if (!open) {
+      setPreview(null)
+      setPreviewPlanId(null)
     }
   }
 
@@ -265,6 +331,14 @@ export function Pricing({ onBack, currentPlanSlug }: PricingPageProps) {
           />
         </div>
       </section>
+
+      <PlanChangeDrawer
+        open={drawerOpen}
+        preview={preview}
+        isConfirming={isCreating}
+        onOpenChange={handleDrawerOpenChange}
+        onConfirm={() => void handleConfirmPlanChange()}
+      />
     </div>
   )
 }

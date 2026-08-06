@@ -1,7 +1,8 @@
-import {
+import type {
   CreateSubscriptionRequest,
   CreateSubscriptionResponse,
   Subscription,
+  SubscriptionPreview,
 } from "./types"
 
 export const getSubscription = async (): Promise<Subscription | null> => {
@@ -26,6 +27,24 @@ export const getSubscription = async (): Promise<Subscription | null> => {
   }
 
   return payload as Subscription
+}
+
+export const previewSubscription = async (
+  planId: string
+): Promise<SubscriptionPreview> => {
+  const response = await fetch("/api/subscriptions/preview", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ planId }),
+  })
+
+  if (!response.ok) {
+    throw new Error("Failed to preview subscription")
+  }
+
+  return response.json()
 }
 
 export const createSubscription = async (

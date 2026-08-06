@@ -70,6 +70,9 @@ export function SubscriptionPage({ onGoPricing }: SubscriptionPageProps) {
     setPortalLoading(true)
     try {
       const { url } = await createBillingPortalSession()
+      if (!url) {
+        throw new Error("Missing billing portal url")
+      }
       window.location.assign(url)
     } catch {
       toast.error("Unable to open the customer portal", {
