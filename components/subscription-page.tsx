@@ -84,13 +84,6 @@ export function SubscriptionPage({ onGoPricing }: SubscriptionPageProps) {
 
   return (
     <div className="container mx-auto flex max-w-6xl flex-col gap-8 p-4 pb-20">
-      <PageHero
-        badge="Billing & usage"
-        icon={Zap}
-        title="Your plan, quotas"
-        highlight="and billing"
-      />
-
       {isLoading && !subscription ? (
         <LoadingState />
       ) : !subscription || !(subscription.effectivePlan ?? subscription.plan) ? (
@@ -192,7 +185,7 @@ function SubscriptionContent({
   return (
     <div className="flex flex-col gap-4">
       <section
-        className="animate-slide-up relative overflow-hidden rounded-2xl border border-border bg-card p-5 sm:p-6"
+        className="animate-slide-up relative overflow-hidden rounded-2xl bg-card p-5 sm:p-6"
         style={{ animationDelay: "0.08s" }}
       >
         <div className="grid items-stretch gap-5 lg:grid-cols-[1.35fr_1fr]">
