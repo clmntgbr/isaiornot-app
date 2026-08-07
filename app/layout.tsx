@@ -5,10 +5,10 @@ import { cn } from "@/lib/utils"
 import { ClerkProvider } from "@clerk/nextjs"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Metadata } from "next"
-import { Geist_Mono, Roboto, Sora } from "next/font/google"
+import { Geist_Mono, Roboto, Sora, Inter } from "next/font/google"
 import "./globals.css"
 
-const roboto = Roboto({ subsets: ["latin"], variable: "--font-sans" })
+const inter = Inter({subsets:['latin'],variable:'--font-sans'})
 
 const sora = Sora({ subsets: ["latin"], variable: "--font-display" })
 
@@ -35,7 +35,7 @@ export default function RootLayout({
         "antialiased",
         fontMono.variable,
         "font-sans",
-        roboto.variable,
+        inter.variable,
         sora.variable
       )}
     >

@@ -15,8 +15,6 @@ interface PageHeroProps {
    * otherwise it is rendered on its own line.
    */
   highlightInline?: boolean
-  /** Optional subtitle paragraph under the title. */
-  subtitle?: React.ReactNode
   /** Extra content rendered at the bottom of the hero (e.g. a toggle). */
   children?: React.ReactNode
 }
@@ -27,7 +25,6 @@ export function PageHero({
   title,
   highlight,
   highlightInline = false,
-  subtitle,
   children,
 }: PageHeroProps) {
   return (
@@ -57,15 +54,6 @@ export function PageHero({
           {highlight}
         </span>
       </h1>
-
-      {subtitle && (
-        <p
-          className="animate-slide-up max-w-xl text-balance text-muted-foreground sm:text-lg"
-          style={{ animationDelay: "0.05s" }}
-        >
-          {subtitle}
-        </p>
-      )}
 
       {children}
     </section>

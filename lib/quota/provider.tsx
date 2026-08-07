@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useReducer } from "react"
+import { useCallback, useReducer } from "react"
 import { getQuota } from "./api"
 import { QuotaContext } from "./context"
 import { quotaReducer } from "./reducer"
@@ -29,10 +29,6 @@ export function QuotaProvider({ children }: { children: React.ReactNode }) {
       dispatch({ type: "GET_QUOTA_LOADING", payload: false })
     }
   }, [])
-
-  useEffect(() => {
-    fetchQuota()
-  }, [fetchQuota])
 
   return (
     <QuotaContext.Provider

@@ -1,5 +1,6 @@
 "use client"
 
+import { SubscriptionDrawerHost } from "@/components/subscription-drawer-host"
 import { ScanProvider } from "@/lib/scan/provider"
 import { UserCentrifugeListener } from "@/lib/centrifugo/user-centrifuge-listener"
 import { PlanProvider } from "@/lib/plan/provider"
@@ -99,6 +100,7 @@ export function AccountShell({ children }: { children: React.ReactNode }) {
           <ScanProvider>
             <StatisticsProvider>
               <UserCentrifugeListener />
+              <SubscriptionDrawerHost />
               <div className="mx-auto bg-background px-0">
                 {isReady || isPaymentReturnRoute ? (
                   children

@@ -1,5 +1,6 @@
 "use client"
 
+import { openSubscriptionDrawer } from "@/components/subscription-drawer-host"
 import { ModeToggle } from "@/components/mode-toggle"
 import { Button } from "@/components/ui/button"
 import {
@@ -42,15 +43,9 @@ export function AppHeader() {
           </Button>
         </Link>
         {isLoaded && isSignedIn ? (
-          <Link href="/subscription">
-            <Button
-              variant={
-                pathname.startsWith("/subscription") ? "secondary" : "ghost"
-              }
-            >
-              Subscription
-            </Button>
-          </Link>
+          <Button variant="ghost" onClick={openSubscriptionDrawer}>
+            Subscription
+          </Button>
         ) : null}
       </nav>
 

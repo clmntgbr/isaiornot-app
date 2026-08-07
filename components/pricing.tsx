@@ -133,7 +133,6 @@ export function Pricing({ onBack, currentPlanSlug }: PricingPageProps) {
         title="Choose the plan"
         highlight="that fits your needs"
         highlightInline
-        subtitle="Multi-model AI image detection. Change or cancel anytime."
       >
         <div
           className="animate-fade-in mt-2 flex items-center gap-3"

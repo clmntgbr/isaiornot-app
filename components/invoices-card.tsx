@@ -2,12 +2,14 @@
 
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { ScansPagination } from "@/components/scans-pagination"
 import { getInvoices } from "@/lib/invoice/api"
 import type { Invoice } from "@/lib/invoice/types"
 import {
   ArrowRight,
+  ChevronLeft,
+  ChevronRight,
   Download,
+  ExternalLink,
   Loader2,
   Lock,
   Receipt,
@@ -50,7 +52,17 @@ export function InvoicesCard({ isFree, onGoPricing }: InvoicesCardProps) {
         if (!cancelled) {
           setInvoices(result.members)
           setTotal(result.total)
-          setTotalPages(result.totalPages)
+          const pages =
+            result.totalPages > 0
+              ? result.totalPages
+              : result.total > 0
+                ? Math.ceil(result.total / PAGE_LIMIT)
+                : 0
+          setTotalPages(pages)
+
+          if (pages > 0 && page > pages) {
+            setPage(pages)
+          }
         }
       } catch {
         if (!cancelled) {
@@ -141,13 +153,30 @@ export function InvoicesCard({ isFree, onGoPricing }: InvoicesCardProps) {
             </div>
 
             {totalPages > 1 && (
-              <div className="border-t px-4 py-3">
-                <ScansPagination
-                  page={page}
-                  totalPages={totalPages}
-                  onPageChange={setPage}
-                  disabled={isLoading}
-                />
+              <div className="flex items-center justify-between gap-3 border-t px-4 py-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={isLoading || page <= 1}
+                  onClick={() => setPage((current) => Math.max(1, current - 1))}
+                >
+                  <ChevronLeft className="size-3.5" aria-hidden="true" />
+                  Previous
+                </Button>
+                <span className="text-xs text-muted-foreground tabular-nums">
+                  Page {page} of {totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={isLoading || page >= totalPages}
+                  onClick={() =>
+                    setPage((current) => Math.min(totalPages, current + 1))
+                  }
+                >
+                  Next
+                  <ChevronRight className="size-3.5" aria-hidden="true" />
+                </Button>
               </div>
             )}
           </>
@@ -161,25 +190,38 @@ function InvoiceRow({ invoice }: { invoice: Invoice }) {
   const label = invoice.number || invoice.description || "Invoice"
   const dateValue =
     invoice.paidAt ?? invoice.stripeCreatedAt ?? invoice.createdAt
+  const hostedUrl = invoice.hostedInvoiceUrl
   const downloadUrl = invoice.invoicePdf ?? invoice.hostedInvoiceUrl
 
   return (
-    <div className="flex items-center justify-between px-6 py-3.5 transition-colors hover:bg-muted/30">
-      <div className="flex items-center gap-3">
-        <div className="flex size-9 items-center justify-center rounded-lg bg-secondary">
+    <div className="flex items-center justify-between gap-3 px-6 py-3.5 transition-colors hover:bg-muted/30">
+      <div className="flex min-w-0 items-center gap-3">
+        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-secondary">
           <Receipt
             className="size-4 text-muted-foreground"
             aria-hidden="true"
           />
         </div>
-        <div>
-          <p className="text-sm font-semibold">{label}</p>
+        <div className="min-w-0">
+          {hostedUrl ? (
+            <a
+              href={hostedUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex max-w-full items-center gap-1.5 text-sm font-semibold text-foreground underline-offset-4 hover:text-primary hover:underline"
+            >
+              <span className="truncate">{label}</span>
+              <ExternalLink className="size-3 shrink-0 opacity-60" aria-hidden="true" />
+            </a>
+          ) : (
+            <p className="truncate text-sm font-semibold">{label}</p>
+          )}
           <p className="text-xs text-muted-foreground">
             {formatInvoiceDate(dateValue)}
           </p>
         </div>
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex shrink-0 items-center gap-3">
         <span className="text-sm font-semibold tabular-nums">
           {formatInvoiceAmount(invoice.total, invoice.currency)}
         </span>
