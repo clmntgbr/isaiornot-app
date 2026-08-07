@@ -36,8 +36,15 @@ export interface SubscriptionPreview {
   subtotal?: number
   total?: number
   prorationDate?: number
+  periodStart?: string
+  periodEnd?: string
   lines?: SubscriptionPreviewLine[]
+  currentPlanId?: string
+  currentPlanSlug?: string
+  targetPlanId?: string
+  targetPlanSlug?: string
   targetPlanName?: string
+  /** Monthly price in cents */
   targetPlanPrice?: number
   url?: string
 }
